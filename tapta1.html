@@ -1,0 +1,798 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html b:version='2' class='v2' expr:dir='data:blog.languageDirection' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'> 
+  <head>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Kuki Land</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/webp" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhO0c1YHv_PW3wflZ-a0qfp6g_6ComgsatXFZJ1NCs0VhXfPcBitd_0jgDIzxzllmJGdufnyOdwMIhJkJB3FSx-6JbwlD2WUD8d7WBTJoiVREh8NB9S1Y07XQqqngVmADkxxPsm2RvaGCsphAABgWOvYqXrJIv3UC9hwO7ZV7l4TZ3Do9KlaxVn9P5sL_cy/s1600/android-chrome-192x192.png">
+  
+  
+    <meta content='IE=EmulateIE7' http-equiv='X-UA-Compatible'/> 
+    <b:if cond='data:blog.isMobile'> 
+      <meta content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0' name='viewport'/> 
+    <b:else/> 
+      <meta content='width=1100' name='viewport'/> 
+    </b:if> 
+    <b:include data='blog' name='all-head-content'/> 
+    <title><data:blog.pageTitle/></title>
+   <b:skin><![CDATA[/*
+-----------------------------------------------
+/////////// HTML THEME////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////TEMPLATE CREATED BY : Anand Khuman////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+----------------------------------------------
+]]></b:skin>
+    
+  <style type="text/css">
+  
+  :root {
+  --primary-color: #ec1f55;
+  --text-color: #333;
+  }
+  
+ 
+  .player {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 2px auto;
+  }
+  
+  .player .icon-pause {
+  display: none;
+  }
+  
+  .player.playing .icon-pause {
+  display: inline-block;
+  }
+  
+  .player.playing .icon-play {
+  display: none;
+  }
+  
+  .dashboard {
+  padding: 20px 5px 20px;
+  background-color: #fff;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  max-width: 1070px;
+  box-shadow: 12px 16px 0px  rgba(0, 0, 0, 0.1);
+  border: 2px 2px 2px solid #000000;
+  }
+  
+  /* HEADER */
+  header {
+  text-align: center;
+  margin-bottom: 10px;
+  }
+  
+  header h3 {
+  color: var(--primary-color);
+  font-size: 50px;
+  }
+  header h2 {
+  color: var(--text-color);
+  font-size: 70px;
+  }
+  
+  /* CD */
+  .cd {
+  display: flex;
+  margin: auto;
+  width: 430px;
+  }
+  
+  .cd-thumb {
+  width: 100%;
+  padding-top: 100%;
+  border-radius: 50%;
+  background-color: #111010;
+  background-size: cover;
+  margin: auto;
+  }
+  
+  /* CONTROL */
+  .control {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 45px 0 8px 0;
+  }
+  
+  .control .btn {
+  color: #131212;
+  padding: 35px;
+  font-size: 50px;
+  }
+  
+  .control .btn.active {
+  color: var(--primary-color);
+  }
+  
+  .control .btn-toggle-play {
+  width: 99px;
+  height: 99px;
+  border-radius: 50%;
+  font-size: 60px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color);
+  }
+  
+  .progress {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 40px;
+  background: #d3d3d3;
+  margin-top: 30px;
+  outline: none;
+  border-radius: 15px; /* Updated border-radius value */
+  opacity: 0.7;
+  -webkit-transition: width 0.2s, opacity 0.2s; /* Updated transition properties */
+  transition: width 0.2s, opacity 0.2s; /* Updated transition properties */
+}
+
+.progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 15px;
+  width: 45px;
+  height: 43px;
+  background-color: var(--primary-color);
+  cursor: pointer;
+}
+
+  /* PLAYLIST */
+  .playlist {
+  margin-top: 1200px;
+  padding: 0;
+  }
+  
+  .song {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  background-color: #fff;
+  height: 130px;
+  padding: 6px 35px 35px;
+  border-radius: 8px;
+  box-shadow: 12px 16px 6px  rgba(0, 0, 0, 0.1);
+  }
+  
+  .song.active {
+  background-color: var(--primary-color);
+  }
+  
+  .song:active {
+  opacity: 0.8;
+  }
+  
+  .song.active .option,
+  .song.active .author,
+  .song.active .title {
+  color: #ffffff;
+  }
+  
+  .song .thumb {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-size: cover;
+  margin: 0px 0px -35px
+  }
+  
+  .song .body {
+  flex: 1;
+  padding: 0 36px;
+  }
+  
+  .song .title {
+  font-size: 45px;
+  color: var(--text-color);
+  padding: 0px 36px;
+  margin-top: 110px;
+  }
+  
+  .song .author {
+  font-size: 30px;
+  color: #999;
+  padding: 0px 36px;
+  margin-bottom: 90px;
+  }
+  
+  .song .option {
+  padding: 16px 8px;
+  color: #999;
+  font-size: 38px;
+  }
+
+  </style>
+  <meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+</head>
+  <body>
+
+<div class="player">
+
+  <!-- Dashboard -->
+
+  <div class="dashboard">
+
+    <!-- Header -->
+
+    <header>
+       
+
+      <h3>Now playing</h3>
+
+      <h2>String 57th & 9th</h2>
+
+    </header>
+    
+    
+
+    <!-- CD -->
+
+    <div class="cd">
+
+      <div class="cd-thumb">
+
+      </div>
+
+    </div>
+    
+    <!-- Control -->
+
+    <div class="control">
+
+      <div class="btn btn-repeat">
+
+        <i class="fas fa-redo"></i>
+
+      </div>
+
+      <div class="btn btn-prev">
+
+        <i class="fas fa-step-backward"></i>
+
+      </div>
+
+      <div class="btn btn-toggle-play">
+
+        <i class="fas fa-pause icon-pause"></i>
+
+        <i class="fas fa-play icon-play"></i>
+
+      </div>
+
+      <div class="btn btn-next">
+
+        <i class="fas fa-step-forward"></i>
+
+      </div>
+
+      <div class="btn btn-random">
+
+        <i class="fas fa-random"></i>
+
+      </div>
+
+    </div>
+    <input id="progress" class="progress" type="range" value="0" step="1" min="0" >
+
+    <audio id="audio" src=""></audio>
+
+
+<marquee direction="left" scrollamount="7" loop="true" bgcolor="black" background-size="100%" style="border-radius: 5px;">
+  <span id="LblMar" style="color: white; font-weight: bold; font-size: 45px;">
+   This Website is maintained by
+ Anand khuman &nbsp;
+Address : Heirok part 2 maning leikai , Thoubal district , Manipur&nbsp;&nbsp;
+Contact no./Whatsapp no. :  +919622755705&nbsp;&nbsp;
+email :  anandkhuman143@gmail.com&nbsp;&nbsp;&nbsp;
+
+  
+
+
+▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀&nbsp;&nbsp;
+  
+ Nongshaba mangang&nbsp;&nbsp;
+Address : Heirok part 2 maning leikai , Thoubal district , Manipur&nbsp;&nbsp;
+Contact no./Whatsapp no. : +918014522156&nbsp;&nbsp;
+email : nnongshaba@gmail.com&nbsp;&nbsp;
+  
+
+
+▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀&nbsp;&nbsp;&nbsp;
+  
+Official email
+email: contact@a2zmanipur.tech
+
+
+</span></marquee>
+
+<marquee direction="left" scrollamount="10" loop="true" bgcolor="green" background-size="100%" style="border-radius: 5px;">
+  <span id="LblMar" style="color: white; font-weight: bold; font-size: 45px;">
+  ▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀ Biography of Tapta Jyenta ▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&nbsp;&nbsp;&nbsp;
+  Jayanta Loukrakpam (meeyamgi TAPTA) asi sachifugi nipanni (8) ni panba yumsakeisha numit (March 30, 1966) ta, Moiranggi Narenseina Mamang Leikaida Lai oikhraba Bijoy Loukrakpam amadi Loukrakpam (ongbi) Mangolnganbi, makhoi aneena taibangpanta meekap thok-hanbikhi.
+
+ ▄▀▄▀▄▀ Family ▀▄▀▄▀▄▀▄&nbsp;&nbsp;&nbsp;
+  Father	(Late) Bijoy Loukrakpam
+  Mother	Loukrakpam (ongbi) Mangolnganbi
+  Spouse	Oinam ningol Pratima Loukrakpam
+  Sister	Khangembam ongbi Ibechaobi
+  Sister	Chingakham ongbi Mema
+  Son	Henba Loukrakpam
+  Daughters	Henbi, Henao, Helli & Henthoi
+  Education
+  Jayenta Loukrakpam, Narenseina Junior Schoolda class 1 (one) dagi 5 (five) faoba tamlak-ee, aduga class 6 (six) tagi 8 (eight) faoba Phubala high school da tamlak-ee. Class IX (9) amadi X (10) dadi Moirang Multipurpose Higher Secondary School da makha tammi, aduga 1983 da Class X gi HSLC exam passed toukhi.
+  
+  Adudagi makha taba oina, Class XI(11) amadi XII(12) tana DM College of Science ta 1984 amadi 1985 ki batch ta tamlakkhi. 1989 da Moirang College tagi TDC (Graduate) pass tourakkhi. Aduga Guwahati da 1989 dagi 1992 faoba Computer Application da Post Graduate Diploma toukhi.
+  
+  Song Classification
+  Jayenta gi eseising asi tongan tonganna khaidoktuna Volume, Series, GV asinachingba eseigi album kayama puthokkhre.
+  
+  Mahakki eseising asi makhagi asumna khaidok-ee.
+  
+  Volume	Akoibagi Samasya Neinaba Eseising
+  Series	Nungsi NungonGi eseising
+  GV (Group Volume)	Mee Puthokpa
+  Pruck	Leibak Ningba Eseising
+  Special Attraction	Samasya Amakhakta Neinaba Eseising
+  Jayanta gi wahei kharadang makhada paodamjari..
+  
+  Sakkhraba eseisingsingduda eina khwaidagi pamna nattraga pamdana sakkhiba esei karambano, ei khangde. Chatkhiba concert singdagi khwaidagi nungaikhiba nattraga nungaikhidaba concert, ei haiba ngamde. Atheeba/fajaba, Nungaiba/Nungaitaba, babkna lepkadabani, eina lepkadaba natte. Eigi oina karambano haiyu hanglaklabadi, madugi paokhum ei leite. Fajei khanna sakkhraba eseising, nungai khanduna chatkhraba concert sing karambana karambano khandokpa ngamfam thokte; loina fajakhi, loina nungaikhi.
+  
+  Award mari(4) fangkhre. Eigi eseibu tabiraga neinabiduna, sakkhangbiduna pukning thougatpirakpa maduna henna eingonda maru oiri. Hayeng wahong fangbadagi ngasi lamkhunu fangbana henna fei haiba paoroudu, TAPTA dadi enna-teinei; fangdrabasu keisu kaide, hayenggidudi kanna hotnaduna ngaigani.
+  
+  Ei, esei mayektagi seihek seidana henna maru oina khalli. Lata Mangeskar, Kishor Kumar….Scorpion, Eagles…aphaoba/aphaobi kayasing asina sakpa eseisingda, marol-mari lousanba ngamdana, artha sukkhang khangdana fajei haiduna tanaribanina, fajaribadu seihek-seidaduda oifam thok-ee. Karamna esei sembage haibadudi pnbada adukki matik lui. Kaka Gandhadagi matamdagi SODDCA gi matam 1971-1996, sanglaba chahi kunmanga(25yrs) asida eigi kokta hanjanba mayamdu chingthoklaga sijinnaba oibana, chingthokfam machin yammi. Amakhak pallamba tarabadi, seihek-seida semge hairabadi chakhao hanghanba tai; lamlabadi wakhal thok-ee, puk thallabadi talli.
+  
+  Awards and Achievements
+  1ST CREATIVE MUSIC AWARD by The Office of the Dean of Students Welfare, MU and GP Womens’ College and Manipur AIDS Control Society (MACS) on 2002
+  ROOP RAAG AWARD on LYRICIST, SINGER & COMPOSER by Roop Raag 43rd Anniversary Celebration Committee on 2003
+  YOUTH ICON AWARD by Manipur University Research Club (MURC) on 2003
+  SINGER OF THIS YEAR, 2014 by Sheirengba Singgi Apunba Lup (SHAL) on 2014
+  INSPIRATIONAL SINGER OF MANIPUR by Manipur University Students’ Union (MUSU) on 2019
+  
+  Early days of Tapta (1960s-1990s)
+  Jayanta, lairaba emungda pokpa oibana mahakna eseida, kalada ngaojaba adu mahakki emunggi meeoisingna support toubiramde. Adubu amata pokchaba machanupa oirubana, mahakki apamba aningbada thoina wa haibasu ngamlamde. Asigumba awaba kayamasu thengnarakkhi, mahakna eseigi lamda khongdarakpasida.
+  
+  Mahakki eseigi lamda pusinbirakkhiba asi, mahakki laioikhraba makhura Gandhadani. Makhura asina mahakpu esei sakpa tambirakkhi amadi tabla thinba tambikhi. Mahakna magi makhura Gandhadagi magumda Likkol sanabada mahakpu esei saknaba neklak-e. Machanupana mike ta esei sakpadu uraga haraojarasu, mama maps aneemaknadi machanupana eseigi lamda khongdabadi pamlamde, adubu mahakki mache aneenadi asukki matik pukning thougatpirammi.
+  
+  Mahakki makhura Gandhadana leikhidraba matungda, mahakki leikhidraba cousin O. Thoibana mahakpu stage ta puthoknaba kanna hotnabikhi, mahakki mapanna ngasidi Jayantana meeyamgi thougal touba ngamba meesak ama oiraklibasisu.
+  Ngaisisu Jayantana, laioikhraba cousin Thoibagi esei amadi esei mayek kaoba leitri – “Shet-pi-ro Ema laan-mee-gi phijet, Tambi-ro Baba nong-mei-kappa”, “Leibak-lei ho leibak-lei taibang taiyon-nabi leibak-lei”, “Ebungo-macha lao-ne nangbu chak-thongbi saan-na-se”.
+  
+  O. Thoibana mahakpu All India Radio (AIR), Imphalda Anganggi thouramda aneerak meetou tamduna sakpa esei saknabagi tanja pibikhi, maduda mahakna first tarakpana mahakki eseigi lamda mai onsannaba hotnabada chaoraba thouna ama pibikhi.
+  
+  Tapta at Guwahati
+  
+  Graduation loisallaba tungda mahak Eseigi lamda mapung fana khongdaba houre. Mahakna Guwahatida Post Graduation touringeida Guitar ama leirami. Ahing nungthil kangdana khongba sannabagadi Yumgi Yumbunafao taranithoirak (12) tanthoklakkhi hai.
+  
+  Mahakna Guitargi string singdu sannaduna Strum touba tamnaba hotnakhi. Matamduda Ranjittagi tips louduna heinaba hotnarammi. Adubu Ranjitna mahakpu strumming touba tambibadu pamdaba matoududa, mahakna Ranjittagi henGe khankhi. Ranjitna tambiyu yaramdabaduna, Jayantana strumming touba heiribasi mahakki mapannani hainasu khanjei.
+  
+  1993 da Post Graduation loisallaba matungda mayumda lakkhi amadi mahana tamjaruba Computer Gi line duda chattaduna Eseida pukning lupsanbaduda mahakki emunggi meeosingna yamna nungaikhide. Mahakna Phubalada leiba Eina Musical Club ta yaosankhi.
+  
+  1994 da mahak Tamna Musical Center da Guitarist, Composer Oina leirammi. 1995 tana Songs, Dance Drama and Cultural Association da Part time Oina yaorammi. Mahakki ehan hanba performance utkhibasi, Rudra High Schoolda Swarsati Puja Numitta oirammi, matamduda mahak lupa 50 khak fangi hai.
+  
+  Mahakki eseigi performance tuna emung manung pubadi ngamlamde. Leikaigi meeymanasu mahakpu karemnafam oirammi, “Guitar ama pairaga koichat chatli..” hainakasu karemnabikhi hai.
+  
+  Masidasu nattana mahakna eseigi lamda changsallakpa matamda, Manipuri Celluloid Film amagi esei composed toubagi matangda wari asum lirak-e.
+  
+  Directorduna matamdugi afaoba senior maming chatliba Nupi seisakpi amada: “Nahaan-gi sur-du taabi-rak-labra Oja?”
+  
+  Seisakpiduna: “Mathong maram khang-daba sur-dubu kamaina taa-doino?”
+  
+  Masidasu nattri, afaoba drummer amana asumna hairakkhi,
+  
+  “Manipurgi music artist 100% na nangbu nung-shide, ama-sung nungi esei taaningde, programme su yeng-ningde, adubu paam-badi paam-mi”.
+  
+  Afaoba Nupa seisakpa amanasu asumna haibikhi haina paodamalak-e
+  
+  Lawai macha-dubu Oja-na nak-sin-naraga chaak-ka kouridubu kari touge hairibano?
+  
+  Asigumba samajki meenok meisa marakta, meeyamna sak-khangba, meeyamna pamnaba seisakpa ama oirakpa haibasi, mahakki akhang kanba, thouna lingjel adunani. Asigumba meewa meisa marakta, ngasidi meeyamgi Tapta, Jayanta na Top topna Manipurgi seisakpasinggi marakta thawanmichakkum ngallare..
+
+
+</span></marquee>
+
+  </div>
+  
+
+
+   
+    <!-- Playlist -->
+
+  <div class="playlist">
+  
+  
+  
+  
+
+  </div>
+  
+  
+
+</div>
+    
+    
+    
+  <script type="text/javascript">
+  //<![CDATA[
+  
+  const $ = document.querySelector.bind(document);
+  const $$ = document.querySelectorAll.bind(document);
+  
+  const PlAYER_STORAGE_KEY = "F8_PLAYER";
+  
+  const player = $(".player");
+  const cd = $(".cd");
+  const heading = $("header h2");
+  const cdThumb = $(".cd-thumb");
+  const audio = $("#audio");
+  const playBtn = $(".btn-toggle-play");
+  const progress = $("#progress");
+  const prevBtn = $(".btn-prev");
+  const nextBtn = $(".btn-next");
+  const randomBtn = $(".btn-random");
+  const repeatBtn = $(".btn-repeat");
+  const playlist = $(".playlist");
+  
+  const app = {
+  currentIndex: 0,
+  isPlaying: false,
+  isRandom: false,
+  isRepeat: false,
+  config: {},
+  // (1/2) Uncomment the line below to use localStorage
+  // config: JSON.parse(localStorage.getItem(PlAYER_STORAGE_KEY)) || {},
+  songs: [
+  {
+  
+      name:"Kuki Land Vol 1",
+      singer:"Tapta Jayenta",
+      path:"https://github.com/Anandkhuman/Music/raw/main/End_of_illegal_immigrants_Chin_Kuki_in_Kangleipak_a2zmanipur.mp3",
+      image:"https://github.com/Anandkhuman/Music/raw/main/Kuki%20Land%20Vol%201.jpg",
+  },
+  {    name: "Kuki Land Vol 2",
+      singer: "Tapta Jayenta",
+      path: "https://github.com/Anandkhuman/Music/raw/main/359554347_175073578789879_2270079620136918405_n.mp3",
+      image: "https://github.com/Anandkhuman/Music/raw/main/Kuki%20Land%20Vol%202.jpg"
+  },
+  {
+      name: "Kuki Land Vol 3",
+      singer: "Tapta Jayenta",
+      path: "https://github.com/Anandkhuman/Music/raw/main/KUKI_LAND_3_9p76XnRqmrs_140.mp3",
+      image: "https://github.com/Anandkhuman/Music/raw/main/kuki%20land%20Vol%203.jpg"
+  },{
+
+      name: "Kuki Land Vol 4",
+
+      singer: "Tapta Jayenta",
+
+      path: "https://github.com/Anandkhuman/Music/raw/main/KUKI_LAND_4_OWjVfk0W6V0_140.mp3",
+
+      image: "https://github.com/Anandkhuman/Music/raw/main/tapta%20vol%204.jpg"
+
+  },{
+
+      name: "Kuki Land Vol 5",
+
+      singer: "Tapta Jayenta",
+
+      path: "https://github.com/Anandkhuman/Music/raw/main/KUKI%20LAND5.mp3",
+
+      image: "https://github.com/Anandkhuman/Music/raw/main/kukiland%205.jpg"
+
+  },{
+
+      name: "Kuki Land Vol 6",
+
+      singer: "Tapta Jayenta",
+
+      path: "https://github.com/Anandkhuman/Music/raw/main/KUKI%20LAND%206.mp3",
+
+      image: "https://github.com/Anandkhuman/Music/raw/main/Kukiland%20Vol%206.jpg"
+
+  },{
+
+      name: "Kuki Land Vol 7",
+
+      singer: "Tapta Jayenta",
+
+      path: "https://github.com/Anandkhuman/Music/raw/main/KUKI%20LAND%207.mp3",
+
+      image: "https://github.com/Anandkhuman/Music/raw/main/Kukiland%207.jpg"
+
+  },
+  
+    ],
+    setConfig: function (key, value) {
+    this.config[key] = value;
+    // (2/2) Uncomment the line below to use localStorage
+    // localStorage.setItem(PlAYER_STORAGE_KEY, JSON.stringify(this.config));
+    },
+    render: function () {
+    const htmls = this.songs.map((song, index) => {
+    return `
+    <div class="song ${
+    index === this.currentIndex ? "active" : ""
+    }" data-index="${index}">
+    <div class="thumb"
+    style="background-image: url('${song.image}')">
+    </div>
+    <div class="body">
+    <h3 class="title">${song.name}</h3>
+    
+    <p class="author">${song.singer}</p>
+                           </div>
+                           <div class="option">
+                               <i class="fas fa-ellipsis-h"></i>
+                           </div>
+                       </div>
+                   `;
+        });
+        playlist.innerHTML = htmls.join("");
+      },
+      defineProperties: function () {
+        Object.defineProperty(this, "currentSong", {
+     get: function () {
+       return this.songs[this.currentIndex];
+     }
+        });
+      },
+      handleEvents: function () {
+        const _this = this;
+        const cdWidth = cd.offsetWidth;
+        
+        // Handle CD spins / stops
+        const cdThumbAnimate = cdThumb.animate([{ transform: "rotate(360deg)" }], {
+        duration: 10000, // 10 seconds
+        iterations: Infinity
+        });
+        cdThumbAnimate.pause();
+        
+     
+        // Handles CD enlargement / reduction
+        document.onscroll = function () {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const newCdWidth = cdWidth - scrollTop;
+        
+        cd.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0;
+        cd.style.opacity = newCdWidth / cdWidth;
+        };
+        
+       
+        // Handle when click play
+        playBtn.onclick = function () {
+        if (_this.isPlaying) {
+        audio.pause();
+        } else {
+        audio.play();
+        }
+        };
+        
+      
+        // When the song is played
+        audio.onplay = function () {
+        _this.isPlaying = true;
+        player.classList.add("playing");
+        cdThumbAnimate.play();
+        };
+        
+        // When the song is pause
+        audio.onpause = function () {
+        _this.isPlaying = false;
+        player.classList.remove("playing");
+        cdThumbAnimate.pause();
+        };
+        
+   
+        // When the song progress changes
+        audio.ontimeupdate = function () {
+        if (audio.duration) {
+        const progressPercent = Math.floor(
+        (audio.currentTime / audio.duration) * 100
+        );
+        progress.value = progressPercent;
+        }
+        };
+        
+       
+        // Handling when seek
+        progress.onchange = function (e) {
+        const seekTime = (audio.duration / 100) * e.target.value;
+        audio.currentTime = seekTime;
+        };
+        
+      
+        // When next song
+        nextBtn.onclick = function () {
+        if (_this.isRandom) {
+        _this.playRandomSong();
+        } else {
+        _this.nextSong();
+        }
+        audio.play();
+        _this.render();
+        _this.scrollToActiveSong();
+        };
+        
+       
+        // When prev song
+        prevBtn.onclick = function () {
+        if (_this.isRandom) {
+        _this.playRandomSong();
+        } else {
+        _this.prevSong();
+        }
+        audio.play();
+        _this.render();
+        _this.scrollToActiveSong();
+        };
+        
+        
+        // Handling on / off random song
+        randomBtn.onclick = function (e) {
+        _this.isRandom = !_this.isRandom;
+        _this.setConfig("isRandom", _this.isRandom);
+        randomBtn.classList.toggle("active", _this.isRandom);
+        };
+        
+   
+        // Single-parallel repeat processing
+        repeatBtn.onclick = function (e) {
+        _this.isRepeat = !_this.isRepeat;
+        _this.setConfig("isRepeat", _this.isRepeat);
+        repeatBtn.classList.toggle("active", _this.isRepeat);
+        };
+   
+        // Handle next song when audio ended
+        audio.onended = function () {
+        if (_this.isRepeat) {
+        audio.play();
+        } else {
+        nextBtn.click();
+        }
+        };
+        
+       
+        // Listen to playlist clicks
+        playlist.onclick = function (e) {
+        const songNode = e.target.closest(".song:not(.active)");
+        
+        if (songNode || e.target.closest(".option")) {
+        
+        // Handle when clicking on the song
+        if (songNode) {
+        _this.currentIndex = Number(songNode.dataset.index);
+        _this.loadCurrentSong();
+        _this.render();
+        audio.play();
+        }
+        
+     
+        // Handle when clicking on the song option
+        if (e.target.closest(".option")) {
+        }
+        }
+        };
+        },
+        scrollToActiveSong: function () {
+        setTimeout(() => {
+        $(".song.active").scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+        });
+        }, 300);
+        },
+        loadCurrentSong: function () {
+        heading.textContent = this.currentSong.name;
+        cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
+        audio.src = this.currentSong.path;
+        },
+        loadConfig: function () {
+        this.isRandom = this.config.isRandom;
+        this.isRepeat = this.config.isRepeat;
+        },
+        nextSong: function () {
+        this.currentIndex++;
+        if (this.currentIndex >= this.songs.length) {
+        this.currentIndex = 0;
+        }
+        this.loadCurrentSong();
+        },
+        prevSong: function () {
+        this.currentIndex--;
+        if (this.currentIndex < 0) {
+        this.currentIndex = this.songs.length - 1;
+        }
+        this.loadCurrentSong();
+        },
+        playRandomSong: function () {
+        let newIndex;
+        do {
+        newIndex = Math.floor(Math.random() * this.songs.length);
+        } while (newIndex === this.currentIndex);
+        
+        this.currentIndex = newIndex;
+        this.loadCurrentSong();
+        },
+        start: function () {
+        
+        // Assign configuration from config to application
+        this.loadConfig();
+       
+        // Defines properties for the object
+        this.defineProperties();
+        
+        
+        // Listening / handling events (DOM events)
+        this.handleEvents();
+        
+       
+        // Load the first song information into the UI when running the app
+        this.loadCurrentSong();
+        
+        // Render playlist
+        this.render();
+        
+        
+        // Display the initial state of the repeat & random button
+        randomBtn.classList.toggle("active", this.isRandom);
+        repeatBtn.classList.toggle("active", this.isRepeat);
+        }
+        };
+        
+        app.start();
+        
+  
+  
+  
+  //]]>
+  </script> 
+  <script type="text/javascript">
+  
+  let time=document.getElementById("time");
+  setInterval(()  =>{
+  let d= new Date();
+  time.innerHTML = d.toLocalTimeString();
+  
+  
+  
+  },1000)
+  
+  
+  </script>  
+ <script type='text/javascript'>
+
+  $(document).ready(function() {
+
+      //Disable cut copy paste
+
+      $(&#39;body&#39;).bind(&#39;cut copy paste&#39;, function(e) {
+
+          e.preventDefault();
+
+      });
+
+      //Disable mouse right click
+
+      $(&quot;body&quot;).on(&quot;contextmenu&quot;, function(e) {
+
+          return false;
+
+      });
+
+  });
+
+</script>
+  </body> 
+</html>
