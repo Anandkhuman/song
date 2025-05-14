@@ -1,0 +1,3158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tapta-Songs-Collection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="icon" type="image/x-icon" href="https://taptalyrics.files.wordpress.com/2017/08/logolicious_20170829_2027251.jpg?w=1080">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+   <style>
+        :root {
+            --primary-accent: #0fd5ca;
+            --secondary-accent: #dc143c;
+            --text-light: #eee;
+            --text-medium: #adadad;
+            --bg-dark-1: #000000;
+            --bg-dark-2: #111111;
+            --bg-dark-3: #1a1a1a;
+            --bg-dark-4: #222222;
+            --border-color: #333333;
+        }
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+          font-size: 16px;
+          overflow: hidden; /* No browser scrollbars */
+          height: 100%;
+        }
+
+        body {
+          background-color: var(--bg-dark-1);
+          font-family: "Roboto", "Noto Sans JP", sans-serif; /* More common UI font */
+          width: 100vw;
+          min-height: 100vh; /* Ensure body takes at least full viewport height */
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 20px 10px; /* Add some padding around content */
+          color: var(--text-light);
+          user-select: none;
+        }
+
+        /* Main content wrapper for animations and layout */
+        #main-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .header {
+         text-align: center;
+         margin-bottom: 25px;
+         width: 90%;
+         max-width: 300px;
+        }
+        .header img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px; /* Optional: slight rounding for the image */
+        }
+
+
+        .music-box {
+          width: 36rem;
+          height: 38rem; /* Original fixed height */
+          position: relative;
+          border-radius: 20px; /* Slightly more rounded */
+          border: 1px solid var(--border-color);
+          background-color: var(--bg-dark-2);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(var(--primary-accent-rgb, 15, 213, 202), 0.1);
+          display: grid;
+          grid-template-columns: 50% 50%;
+          grid-template-rows: 55% 10% 10% 25%; /* Cover/Queue | Info | Progress | Buttons */
+          transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+        }
+        .music-box:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(var(--primary-accent-rgb, 15, 213, 202), 0.2);
+        }
+
+
+        .blur {
+          width: 28rem; /* Slightly smaller than cover image width */
+          height: 28rem;
+          border-radius: 16%;
+          position: absolute;
+          /* Centered under the cover image area, considering padding */
+          /* These calculations might need adjustment if music-box size changes significantly and blur is not hidden */
+          top: calc(25px + (30rem * 0.55 * 0.5) - 14rem); /* (padding + half of cover area height) - half of blur height */
+          left: calc(25px + (36rem * 0.5 * 0.5) - 14rem); /* (padding + half of cover area width) - half of blur width */
+          filter: blur(10px);
+          z-index: -1;
+          background-image: var(--cover-image-url); /* Will be set by JS */
+          background-size: cover;
+          background-position: center;
+          opacity: 0.7; /* Make it subtle */
+        }
+
+        .cover-wrapper {
+          display: grid;
+          place-items: center;
+          padding: 25px;
+          grid-column: 1; /* Explicitly set for base style */
+          grid-row: 1;    /* Explicitly set for base style */
+        }
+
+        .cover-image {
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          border-radius: 17%;
+          cursor: pointer;
+          background-color: var(--bg-dark-4); /* Placeholder bg */
+          box-shadow: 0 5px 15px rgba(0,0,0,0.2), -1px -1px 60px rgba(var(--primary-accent-rgb, 15, 213, 202), 0.3);
+          object-fit: cover; /* Ensure image covers the area */
+        }
+
+        .cover-image-big-size {
+          position: fixed;
+          width: 85vmin;
+          height: 85vmin;
+          max-width: 600px;
+          max-height: 600px;
+          border-radius: 15px;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          cursor: pointer;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) scale(0.7);
+          opacity: 0;
+          transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease-out;
+          z-index: 1000;
+          object-fit: cover;
+        }
+        .cover-image-big-size.show { /* Animation class */
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+
+        .queue {
+          color: var(--text-light);
+          font-size:1.1rem; /* Slightly smaller for better fit */
+          font-family: "Noto Sans JP", sans-serif;
+          letter-spacing: 0.5px;
+          padding: 25px 10px 25px 0; /* Adjusted padding */
+          overflow: hidden;
+         /* margin-left:-5px; /* Adjusted margin */
+          grid-column: 2; /* Explicitly set for base style */
+          grid-row: 1;    /* Explicitly set for base style */
+          display: flex;
+          flex-direction: column;
+        }
+
+        .queue .active {
+          transform: scale(1.05) translateX(5px); /* Subtle active indication */
+          color: var(--primary-accent);
+          font-weight: 500;
+        }
+
+       /* === CSS MODIFIED HERE === */
+        .queue .track-item {
+          transition: transform 0.2s ease-out, color 0.2s ease-out;
+          cursor: pointer;
+          margin-left: 10px; /* Adjusted margin */
+          text-indent: 0px;  /* Removed indent */
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: calc(100% - 15px); /* Adjust if needed */
+          padding: 4px 8px; /* Added padding for better touch targets */
+          border-radius: 4px;
+        }
+       /* ========================= */
+       
+        .queue .track-item-empty {
+            margin-left: 10px; /* Match track-item */
+            color: var(--text-medium);
+            font-style: italic;
+        }
+
+        .queue .track-item:hover {
+          transform: scale(1.05) translateX(5px);
+          color: var(--secondary-accent);
+          background-color: rgba(255,255,255,0.05);
+        }
+
+        .track-items-wrapper {
+          scrollbar-width: thin; /* Firefox */
+          scrollbar-color: var(--primary-accent) var(--bg-dark-4); /* Firefox */
+          width: 100%;
+          height: 100%;
+          overflow-x: hidden;
+          overflow-y: auto;
+          padding-right: 5px; /* Space for scrollbar */
+        }
+
+        .queue .track-item:first-child {
+          margin-top: 18px;
+        }
+
+        .track-items-wrapper::-webkit-scrollbar {
+          width: 6px;
+        }
+        .track-items-wrapper::-webkit-scrollbar-track {
+          background: var(--bg-dark-4);
+          border-radius: 3px;
+        }
+        .track-items-wrapper::-webkit-scrollbar-thumb {
+          background-color: var(--primary-accent);
+          border-radius: 3px;
+        }
+
+        .track-information {
+          font-family: "Noto Sans JP", sans-serif;
+          display: flex;
+          flex-direction: column; /* Stack artist and album/track line */
+          justify-content: center;
+          align-items: center;
+          gap: 5px; /* Space between the two info lines */
+          color: var(--text-medium);
+          grid-column-start: span 2; /* Span across both columns */
+          grid-row: 2; /* Explicitly set for base style */
+          padding: 5px 15px; /* Add some horizontal padding */
+          overflow: hidden;
+        }
+
+        .track-information > div { /* Each info line */
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px; /* Space between icon and text block */
+          width: 100%;
+          text-align: center;
+          transition: color 0.3s; /* Keep transition for hover */
+        }
+        .track-information > div:hover { color: var(--primary-accent); }
+        .track-information > div:hover .track-information-icon path { fill: var(--primary-accent) !important; }
+
+
+        .track-information-icon {
+          width: 1.5rem; /* Smaller, more modern icon size */
+          height: 1.5rem;
+          flex-shrink: 0;
+        }
+        .track-information-icon path { transition: fill 0.3s; }
+
+
+        .track-information-texts, .trackName {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 0.9rem;
+          max-width: 18ch; /* Adjust as needed based on content */
+        }
+        .trackName {
+          font-weight: 500; /* Make track name slightly bolder */
+          color: var(--text-light);
+        }
+
+
+        .track-progress {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 15px;
+          grid-column-start: span 2; /* Span across both columns */
+          grid-row: 3; /* Explicitly set for base style */
+        }
+
+        .track-progress-bar {
+          width: 65%;
+          height: 8px; /* Slimmer bar */
+          background: var(--bg-dark-4);
+          border-radius: 4px;
+          overflow: hidden;
+          cursor: pointer;
+          position: relative;
+        }
+
+        .track-loading {
+          width: 30px; /* Smaller loading indicator */
+          height: 100%;
+          background: var(--primary-accent);
+          position: absolute;
+          border-radius: 4px;
+          animation: track-loading 1.2s ease-in-out infinite alternate;
+          left: -5px;
+          transform: scaleX(1);
+        }
+
+        @keyframes track-loading { /* Simpler loading animation */
+          from { left: 0%; width: 10%; }
+          to { left: 90%; width: 10%; }
+        }
+
+        .track-current-time-progress-bar {
+          width: 0;
+          height: 100%;
+          background-color: var(--primary-accent);
+          border-radius: 4px;
+          transition: width 0.1s linear; /* Smooth progress update */
+        }
+
+        .track-time {
+          color: var(--text-medium);
+          font-size: 0.85rem;
+          width: 40px;
+          text-align: center;
+        }
+
+        .buttons {
+          display: flex;
+          justify-content: space-evenly;
+          align-items: center;
+          grid-column-start: span 2; /* Span across both columns */
+          grid-row: 4; /* Explicitly set for base style */
+          padding-bottom: 10px; /* Space for buttons */
+        }
+
+        .button {
+          width: 3.8rem; /* Slightly smaller buttons */
+          height: 3.8rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          position: relative;
+          transition: transform 0.2s ease-out, background-color 0.2s ease-out;
+          border-radius: 50%; /* Make buttons circular */
+        }
+        .button:hover {
+            background-color: rgba(var(--primary-accent-rgb, 15, 213, 202), 0.15);
+            transform: scale(1.1);
+        }
+        .button:active {
+            transform: scale(0.95);
+        }
+
+        .button > svg { /* Target SVGs directly */
+          width: 2rem; /* Adjust icon size within button */
+          height: 2rem;
+          fill: var(--text-light); /* Default icon color */
+          transition: fill 0.3s;
+        }
+        .button:hover > svg {
+            fill: var(--primary-accent);
+        }
+        #playButton svg { width: 2.2rem; height: 2.1rem; } /* Play button icon slightly larger */
+
+
+        /* Controls Below Card */
+        .controls-below-card {
+            margin-top: -18px; /* Adjusted from original 20px to pull it up slightly if music-box height is fixed */
+                               /* If music-box height is auto, this negative margin might need care */
+            padding: 2px; /* Reduced padding */
+            background-color: var(--bg-dark-3);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            width: 90%;
+            max-width: 36rem; /* Match music-box for alignment */
+            display: flex;
+            flex-direction: column; /* Stack search and select */
+            gap: 4px; /* Reduced gap */
+            transform: translateY(50px);
+            opacity: 0;
+            animation: slideUpFadeInControls 0.7s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes slideUpFadeInControls {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #searchInput, #albumFilterSelect {
+          background-color: var(--bg-dark-4);
+          border: 1px solid var(--border-color);
+          color: var(--text-light);
+          padding: 12px 18px;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-family: "Roboto", sans-serif;
+          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          width: 100%; /* Full width within their container */
+        }
+        #searchInput::placeholder { color: var(--text-medium); opacity: 0.7; }
+
+        #searchInput:focus, #albumFilterSelect:focus {
+          border-color: var(--primary-accent);
+          box-shadow: 0 0 0 3px rgba(var(--primary-accent-rgb, 15, 213, 202), 0.25);
+          outline: none;
+        }
+        #albumFilterSelect { cursor: pointer; }
+        #albumFilterSelect option { background-color: var(--bg-dark-4); color: var(--text-light); }
+
+
+        .icon-container { display: flex; align-items: center; gap: 3rem; } /* Gap might be large for small screens */
+        .icon-button { background-color: transparent; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;}
+        .icon-button svg { width: 3rem; height: 3rem; fill: var(--text-medium); transition: fill 0.3s, transform 0.3s; color: #ffffff;}
+        .icon-button:hover svg { fill: var(--primary-accent); transform: scale(1.1); }
+
+        .whatsapp-ico{ fill: var(--text-light); width: 2rem; height: 2rem; padding: 3px; background-color: #25D366; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.3s, box-shadow 0.3s; display: block; }
+        .whatsapp-ico:hover{ transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+
+
+        /* Responsive Adjustments */
+        @media screen and (max-width: 768px) {
+          .music-box {
+            width: 90vw; /* Allow music box to shrink */
+            max-width: 450px; /* But not exceed a reasonable tablet size if 90vw is too large */
+                               /* Or max-width: 36rem; to match desktop exactly if preferred */
+            height: auto; /* Allow height to adjust to content, especially if rows are % */
+            min-height: 500px; /* Ensure a minimum height */
+            /* grid-template-columns: 1fr; /* MODIFIED: REMOVED to keep 50% 50% base columns */
+            /* grid-template-rows: auto auto auto auto auto; /* MODIFIED: REMOVED to keep base row structure */
+            padding-bottom: 15px; /* This padding is for the box itself, can be kept */
+          }
+          .controls-below-card {
+            max-width: 90vw; /* Match music-box responsive width */
+          }
+
+          /* MODIFIED: Order properties are removed to maintain base layout flow */
+          .cover-wrapper {
+            /* order: 1; */ /* REMOVED */
+            padding: 20px; /* Slightly reduced padding for smaller screens is fine */
+          }
+          .queue {
+            /* order: 2; */ /* REMOVED */
+            max-height: 180px; /* Keep this, good for constrained space in its grid cell */
+            margin-left: 0; /* Adjust margin for narrower column */
+            padding: 10px 15px; /* Adjust padding for narrower column */
+          }
+          .track-information {
+            /* order: 3; */ /* REMOVED */
+            padding: 10px 15px; /* Reduced padding fine */
+          }
+          .track-progress {
+            /* order: 4; */ /* REMOVED */
+            padding: 10px 0; /* Padding adjustment fine */
+          }
+          .buttons {
+            /* order: 5; */ /* REMOVED */
+            padding-top: 10px; /* Padding adjustment fine */
+          }
+
+          .blur {
+            display: none; /* Kept as per original: Hiding blur on smaller screens for performance/layout simplicity */
+                           /* If "same style" means blur MUST be visible, remove this line and adjust .blur styles for responsiveness */
+          }
+        }
+
+        @media screen and (max-width: 480px) {
+          html { font-size: 14px; } /* Base font size reduction for small screens */
+          body { padding: 15px 5px; } /* Reduce body padding */
+          .header { margin-bottom: 20px; max-width: 250px; }
+
+          .music-box {
+             min-height: 500px; /* Adjust min-height for very small screens */
+             border-radius: 15px; /* Slightly less rounded corners */
+          }
+          .controls-below-card {
+            margin-top: -15px; /* Adjust margin */
+            padding: 0px; /* Adjust padding */
+            border-radius: 10px;
+          }
+          #searchInput, #albumFilterSelect {
+            padding: 10px 15px;
+            font-size: 0.9rem;
+          }
+
+          .queue {
+            font-size: 1rem; /* Adjust font size in queue */
+            max-height: 250px; /* Further adjust max height for queue */
+          }
+          
+         /* === CSS MODIFIED HERE (Responsive) === */
+          .queue .track-item {
+            margin-left: 5px; /* Adjust track item indentation */
+            text-indent: 0px; /* Remove indent */
+            padding: 3px 6px;
+          }
+         /* ====================================== */
+
+          .track-information-icon { width: 1.3rem; height: 1.3rem; }
+          .track-information-texts, .trackName { font-size: 0.85rem; max-width: 15ch; }
+          .track-time { font-size: 0.8rem; width: 35px; }
+
+          .button { width: 3.5rem; height: 3.5rem; } /* Smaller buttons */
+          .button > svg { width: 1.8rem; height: 1.8rem; } /* Smaller icons in buttons */
+          #playButton svg { width: 2rem; height: 2rem; }
+
+          .icon-container { gap: 1.5rem; } /* Reduce gap for share/whatsapp icons */
+          .icon-button svg { width: 24px; height: 24px; } /* Scale down share icon */
+          .whatsapp-ico { width: 24px; height: 24px; } /* Scale down whatsapp icon */
+        }
+
+        /* Splash Screen (Original) */
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #001822; display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 1; transition: opacity 0.8s ease-in-out; }
+        #splash-screen.fade-out { opacity: 0; }
+        #splash-screen img { max-width: 80%; max-height: 80%; }
+        .hidden { display: none !important; } /* Ensure hidden is respected */
+        #main-content {
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            width: 100%; /* Ensure it takes up space for alignment */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #main-content.fade-in { opacity: 1; }
+    </style>
+</head>
+<body>
+    <!-- BODY HTML REMAINS THE SAME -->
+    <div id="splash-screen">
+        <img src="https://github.com/Anandkhuman/Music/raw/main/icon.png" alt="Splash Screen Image">
+    </div>
+
+    <div id="main-content-wrapper"> <!-- This wrapper helps manage the overall page flow -->
+        <div id="main-content" class="hidden">
+            <div class="header">
+                <img alt='Tapta song collection'
+                src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi3nSRGZrlQSNT4WtQfaPi-nLcrbhYDVAeqMHUwiymz_Gpg0nD2q61yADJNqFAWrgXh4N7ehxja2y6ktgkihUIEds0LWkPHdNOVx8d0soRQOXhiJHZu2nU7hDte9V0LX_DXbnTfsxeL8iDqsErXfOJJGDWYL5TLZllPWA3q4HPI6hXZNgZLyLHCY5fcjA/s300/ezgif.com-gif-maker%20(2).gif'/>
+            </div>
+	<div class="controls-below-card" id="controlsBelowCard">
+                <input type="search" id="searchInput" placeholder="Search title, artist, album...">
+                <select id="albumFilterSelect"></select>
+            </div>
+
+            <section class="music-box" id="musicBox">
+                <div class="blur" id="blurElement"></div>
+                <section class="cover-wrapper">
+                  <img class="cover-image" id="coverImage" src="" alt="🎵 Cover Image 🎵" />
+                </section>
+
+                <section class="queue">
+                  <div class="track-items-wrapper" id="trackItemsWrapper"></div>
+                </section>
+
+                <section class="track-information">
+                  <div>
+                    <svg viewBox="0 0 480.79175 424.00003" class="track-information-icon" xmlns="http://www.w3.org/2000/svg">
+                      <g style="fill: currentColor" transform="translate(-15.998759,-71.999977)">
+                          <path d="m 487.288,312.312 -40,-8.151 a 7.979,7.979 0 0 0 -5.942,1.122 l -20.1,13 -68.665,7.506 -0.571,-84.39 3.1,-8.418 26.305,12.377 a 7.994,7.994 0 0 0 10.644,-3.832 l 13.629,-28.95 a 8,8 0 0 0 -3.833,-10.646 l -60.478,-28.452 a 32.041,32.041 0 1 0 -21.372,43.689 c 0.314,-0.081 0.622,-0.176 0.932,-0.266 l 19.641,9.242 -4.085,11.091 A 8,8 0 0 0 336,240.053 l 0.592,87.483 -15.549,1.7 -0.514,-35.972 a 69.842,69.842 0 0 0 -38.194,-61.372 l -21.322,-10.875 -0.062,-0.032 -3.7,-1.882 v -28.9 A 39.764,39.764 0 0 0 264,168 V 127.718 A 28,28 0 0 0 260,72 h -46 a 54.062,54.062 0 0 0 -54,54 v 26 a 24.028,24.028 0 0 0 24,24 h 0.805 a 39.875,39.875 0 0 0 8.445,17.549 V 200 h -22.23 a 127.289,127.289 0 0 0 -66.732,18.887 L 35.18,261.416 a 33.135,33.135 0 0 0 -12.3,13.446 l -3.359,6.718 A 33.2,33.2 0 0 0 48.079,329.643 79.973,79.973 0 0 0 105.25,455.6 V 488 a 8,8 0 0 0 8,8 H 256 a 8,8 0 0 0 7.973,-8.665 l -7.286,-87.377 a 63.245,63.245 0 0 0 5.057,-11.081 l 1.736,6.079 A 18.088,18.088 0 0 0 280.79,408 h 24.46 a 7.886,7.886 0 0 0 0.8,-0.04 v 0 h 0.036 l 31.03,-3.1 0.563,83.2 16,-0.108 -0.551,-81.408 c 0.288,-0.039 0.576,-0.071 0.863,-0.129 l 32.058,-6.449 a 8,8 0 0 0 7.2,-7.96 v -22.393 l 29.893,-3.271 c 0,0 29.704,9.658 30.548,9.658 a 7.989,7.989 0 0 0 3.319,-0.721 l 35.1,-16 a 8,8 0 0 0 4.644,-8.053 l -3.1,-31.85 a 8,8 0 0 0 -6.365,-7.064 z M 366.209,202.843 387.8,213 l -6.815,14.475 -20.329,-9.566 z m -50.2,-1.167 a 16,16 0 1 1 11.491,-19.492 15.878,15.878 0 0 1 -11.495,19.492 z m -48.38,62.216 a 8,8 0 0 0 6.3,-10.344 l -3.081,-9.548 4.218,2.151 a 53.882,53.882 0 0 1 29.465,47.348 l 0.536,37.489 -38.622,4.222 5.316,-21.265 a 8,8 0 0 0 -15.522,-3.88 l -4.621,18.484 A 64.279,64.279 0 0 0 211.3,304.808 l 12.841,-33.67 z m -139.721,99.672 a 8.02,8.02 0 0 0 -2.22,-2.22 L 68.734,323.372 c 0.021,-0.014 0.042,-0.027 0.063,-0.042 l 23,-13.474 39.8,39.8 a 8.016,8.016 0 0 0 4.087,2.188 l 33.57,6.719 V 384 h -27.733 z m 7.173,35.347 a 23.981,23.981 0 0 1 -29.416,-31.686 l 9.815,6.544 13.336,20.017 a 14.007,14.007 0 0 0 6.265,5.125 z m 6.113,-62.28 -24.538,-24.539 a 63.408,63.408 0 0 1 42.287,19.125 8,8 0 0 0 10.946,0.458 47.964,47.964 0 0 1 68.991,6.545 l -60.574,6.62 a 13.916,13.916 0 0 0 -4.316,-1.645 z M 248,168 a 24,24 0 0 1 -48,0 v -40 h 48 z m 3.058,66.739 4.8,14.893 -18.732,3.122 z m -41.808,-29.57 a 39.9,39.9 0 0 0 32,-1.085 v 17.183 l -19.8,25.6 -12.2,-40.054 z M 184,160 a 8,8 0 0 1 0,-16 z m 8,-48 a 8,8 0 0 0 -8,8 v 8 a 23.889,23.889 0 0 0 -8,1.376 V 126 a 38.043,38.043 0 0 1 38,-38 h 46 a 12,12 0 0 1 0,24 z m 4.976,109.437 7.16,23.5 -20.145,-13.429 z M 38.9,310.239 a 17.227,17.227 0 0 1 -5.074,-21.5 l 3.364,-6.727 c 1.434,-2.876 75.483,-49.5 75.483,-49.5 A 111.3,111.3 0 0 1 171.02,216 h 6.86 l -12.48,9.679 a 8,8 0 0 0 0.466,12.977 l 42.688,28.459 -14.212,37.264 a 64.019,64.019 0 0 0 -29.172,10.77 79.246,79.246 0 0 0 -51.5,-19.14 l 26.677,-17.3 a 8,8 0 1 0 -8.706,-13.424 c 0,0 -77.612,48.021 -80.83,48.322 H 50.783 A 17.112,17.112 0 0 1 38.9,310.239 Z M 49.25,376 a 63.773,63.773 0 0 1 12.542,-38.027 l 30.38,20.256 A 39.989,39.989 0 0 0 159.984,400 h 11.266 a 14.008,14.008 0 0 0 12.366,-7.453 l 62.233,-6.807 a 47.987,47.987 0 0 1 -68.871,23.665 8,8 0 0 0 -10.683,2.41 A 64,64 0 0 1 49.25,376 Z M 184,480 h -62.75 v -24.407 a 79.958,79.958 0 0 0 54.05,-29.093 63.848,63.848 0 0 0 8.7,3.117 z m 16,0 v -48.033 c 0.417,0.008 0.833,0.033 1.25,0.033 a 63.7,63.7 0 0 0 40.828,-14.685 L 247.306,480 Z m 97.512,-88 H 280.79 a 2.015,2.015 0 0 1 -1.928,-1.447 l -2.333,-8.169 21.38,-2.338 z M 185.25,376.273 v -16.1 l 151.45,-16.553 0.109,16.076 z m 128.3,14.857 0.426,-12.841 22.943,-2.51 0.088,13.009 z m 32.579,-180.057 -9.507,-4.473 a 32.2,32.2 0 0 0 6.819,-14.468 l 8.237,3.875 z m 31.117,174.368 -24,4.8 v -23.379 c 0,-0.054 0,-0.108 0,-0.162 v -0.141 l 24,-4.8 z m 75.978,-26.02 -26.716,-8.821 a 7.953,7.953 0 0 0 -3.378,-0.356 l -32.045,3.507 a 15.946,15.946 0 0 0 -16.978,-7.686 l -21.36,4.272 -0.058,-8.468 72.181,-7.891 a 7.967,7.967 0 0 0 3.475,-1.235 l 18.948,-12.256 31.008,6.318 1.973,20.281 z" />
+                      </g>
+                    </svg>
+                    <div class="track-information-texts" id="trackArtistName"></div>
+                  </div>
+                  <div>
+                    <svg viewBox="0 0 128 128" class="track-information-icon" xmlns="http://www.w3.org/2000/svg">
+                      <g style="fill: currentColor" transform="matrix(1.1226926,0,0,1.1226926,-7.7232168,-8.2621092)">
+                          <path d="m 99.1269,17.0169 h -61.88 a 11.149,11.149 0 0 0 -11.03,9.678 11.148,11.148 0 0 0 -9.68,11.032 v 61.87 a 11.157,11.157 0 0 0 11.14,11.15 h 61.88 a 11.15,11.15 0 0 0 11.031,-9.677 11.15,11.15 0 0 0 9.679,-11.033 v -61.88 a 11.153,11.153 0 0 0 -11.14,-11.14 z m -9.57,90.23 h -61.88 a 7.653,7.653 0 0 1 -7.64,-7.65 v -61.87 a 7.651,7.651 0 0 1 6.07,-7.476 v 59.786 a 11.153,11.153 0 0 0 11.14,11.14 h 59.784 a 7.653,7.653 0 0 1 -7.474,6.07 z m 17.21,-17.21 a 7.649,7.649 0 0 1 -7.64,7.64 h -61.88 a 7.649,7.649 0 0 1 -7.64,-7.64 v -61.88 a 7.648,7.648 0 0 1 7.64,-7.64 h 61.88 a 7.648,7.648 0 0 1 7.64,7.64 z" />
+                          <path d="m 89.1739,35.3049 a 1.751,1.751 0 0 0 -1.484,-0.335 l -25.081,5.795 a 1.751,1.751 0 0 0 -1.356,1.705 v 24.528 a 9.1,9.1 0 1 0 3.5,7.161 v -21.4 l 21.581,-4.986 v 13.221 a 9.1,9.1 0 1 0 3.5,7.162 v -31.481 a 1.752,1.752 0 0 0 -0.66,-1.37 z m -33.528,44.461 a 5.607,5.607 0 1 1 5.607,-5.607 5.614,5.614 0 0 1 -5.607,5.607 z m 9.107,-35.9 21.581,-4.987 v 5.305 l -21.581,4.982 z m 15.975,29.9 a 5.607,5.607 0 1 1 5.606,-5.606 5.613,5.613 0 0 1 -5.606,5.602 z" />
+                      </g>
+                    </svg>
+                    <div class="track-information-texts" id="trackAlbumName"></div>
+                    <span style="margin: 0 3px; color: var(--text-medium); font-size: 0.9em;">/</span>
+                    <div class="trackName" id="trackName"></div>
+                  </div>
+                </section>
+                <section class="track-progress">
+                  <div class="track-time" id="currentTrackTimeNumber">0:00</div>
+                  <div class="track-progress-bar" id="trackProgressBar">
+                    <div id="trackLoading"></div>
+                    <div class="track-current-time-progress-bar" id="currentTrackTimeBar"></div>
+                  </div>
+                  <div class="track-time" id="currentTrackDuration">0:00</div>
+                </section>
+                <section class="buttons">
+                  <div class="button" id="previousButton" aria-label="Previous Song">
+                    <svg viewBox="0 0 49.403337 46.048437" xmlns="http://www.w3.org/2000/svg">
+                      <g transform="matrix(-1,0,0,1,36.965131,0.02843878)"> <path d="m 14.757,46.02 c -1.412,0 -2.825,-0.521 -3.929,-1.569 -2.282,-2.17 -2.373,-5.78 -0.204,-8.063 L 23.382,22.97 10.637,9.645 C 8.46,7.37 8.54,3.76 10.816,1.582 c 2.277,-2.178 5.886,-2.097 8.063,0.179 l 16.505,17.253 c 2.104,2.2 2.108,5.665 0.013,7.872 L 18.893,44.247 c -1.123,1.177 -2.626,1.773 -4.136,1.773 z" /> </g>
+                      <g transform="matrix(-1,0,0,1,58.458378,1.7267946e-4)"> <path d="m 14.757,46.02 c -1.412,0 -2.825,-0.521 -3.929,-1.569 -2.282,-2.17 -2.373,-5.78 -0.204,-8.063 L 23.382,22.97 10.637,9.645 C 8.46,7.37 8.54,3.76 10.816,1.582 c 2.277,-2.178 5.886,-2.097 8.063,0.179 l 16.505,17.253 c 2.104,2.2 2.108,5.665 0.013,7.872 L 18.893,44.247 c -1.123,1.177 -2.626,1.773 -4.136,1.773 z" /> </g>
+                    </svg>
+                  </div>
+                  <div class="button" id="playButton" aria-label="Play/Pause">
+                    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"> <g transform="matrix(1.1428832,0,0,1.1428832,-1.3924967,-2.2857665)"> <path d="M 26.17,12.37 9,2.45 A 3.23,3.23 0 0 0 7.38,2 3.38,3.38 0 0 0 4,5.38 v 21.29 a 3.33,3.33 0 0 0 5.1,2.82 L 26.29,18.63 a 3.65,3.65 0 0 0 -0.12,-6.26 z" /> </g> </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.607 47.607" style="opacity: 0; position: absolute;"> <g> <path d="M17.991,40.976c0,3.662-2.969,6.631-6.631,6.631l0,0c-3.662,0-6.631-2.969-6.631-6.631V6.631C4.729,2.969,7.698,0,11.36,0   l0,0c3.662,0,6.631,2.969,6.631,6.631V40.976z" fill="currentColor"></path> <path d="M42.877,40.976c0,3.662-2.969,6.631-6.631,6.631l0,0c-3.662,0-6.631-2.969-6.631-6.631V6.631   C29.616,2.969,32.585,0,36.246,0l0,0c3.662,0,6.631,2.969,6.631,6.631V40.976z" fill="currentColor"></path> </g> </svg>
+                  </div>
+                  <div class="button" id="nextButton" aria-label="Next Song">
+                    <svg viewBox="0 0 49.403337 46.048437" xmlns="http://www.w3.org/2000/svg">
+                      <g transform="translate(12.438204,0.02843878)"> <path d="m 14.757,46.02 c -1.412,0 -2.825,-0.521 -3.929,-1.569 -2.282,-2.17 -2.373,-5.78 -0.204,-8.063 L 23.382,22.97 10.637,9.645 C 8.46,7.37 8.54,3.76 10.816,1.582 c 2.277,-2.178 5.886,-2.097 8.063,0.179 l 16.505,17.253 c 2.104,2.2 2.108,5.665 0.013,7.872 L 18.893,44.247 c -1.123,1.177 -2.626,1.773 -4.136,1.773 z" /> </g>
+                      <g transform="translate(-9.0550423,1.7267946e-4)"> <path d="m 14.757,46.02 c -1.412,0 -2.825,-0.521 -3.929,-1.569 -2.282,-2.17 -2.373,-5.78 -0.204,-8.063 L 23.382,22.97 10.637,9.645 C 8.46,7.37 8.54,3.76 10.816,1.582 c 2.277,-2.178 5.886,-2.097 8.063,0.179 l 16.505,17.253 c 2.104,2.2 2.108,5.665 0.013,7.872 L 18.893,44.247 c -1.123,1.177 -2.626,1.773 -4.136,1.773 z" /> </g>
+                    </svg>
+                  </div>
+                  <div class="icon-container">
+                    <button id="shareButton" class="icon-button" aria-label="Share">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"> <path d="M96 32 L28 64 L96 96" fill="none" stroke="currentColor" stroke-width="12" /> <circle cx="28" cy="64" r="15" fill="currentColor" /> <circle cx="96" cy="32" r="15" fill="currentColor" /> <circle cx="96" cy="96" r="15" fill="currentColor" /> </svg>
+                    </button>
+                    <a href="whatsapp://send?phone=+919089988921" class="icon-button" aria-label="Chat on WhatsApp">
+                        <svg viewBox="0 0 32 32" class="whatsapp-ico"><path d=" M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.09-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.478-1.318.13-.33.244-.73.244-1.088 0-.058 0-.144-.03-.215-.1-.172-2.434-1.39-2.678-1.39zm-2.908 7.593c-1.747 0-3.48-.53-4.942-1.49L7.793 24.41l1.132-3.337a8.955 8.955 0 0 1-1.72-5.272c0-4.955 4.04-8.995 8.997-8.995S25.2 10.845 25.2 15.8c0 4.958-4.04 8.998-8.998 8.998zm0-19.798c-5.96 0-10.8 4.842-10.8 10.8 0 1.964.53 3.898 1.546 5.574L5 27.176l5.974-1.92a10.807 10.807 0 0 0 16.03-9.455c0-5.958-4.842-10.8-10.802-10.8z" fill-rule="evenodd"></path></svg>
+                    </a>
+                  </div>
+                </section>
+            </section>
+
+            
+        </div>
+    </div>
+
+   <!-- SCRIPT SECTIONS REMAIN THE SAME -->
+   <script>
+      const shareButton = document.getElementById("shareButton");
+      if (shareButton) {
+        shareButton.addEventListener("click", async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: "Tapta Song Collection",
+                        text: "Tapta gi esei khudingmak mafam asida fangbigani please listen and share Enjoy thanks you \n",
+                        url: window.location.href
+                    });
+                } catch (error) {
+                    console.error("Error sharing:", error);
+                }
+            } else {
+                alert("Web Share API not supported. Try copying the URL.");
+            }
+        });
+      }
+      </script>
+  <script>
+    window.addEventListener('load', function () {
+      const splashScreen = document.getElementById('splash-screen');
+      const mainContent = document.getElementById('main-content');
+      const controlsBelow = document.getElementById('controlsBelowCard'); // For animation later
+
+      // Convert RGB string to array for CSS variable
+      function setPrimaryAccentRGB() {
+        const primaryAccentColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-accent').trim();
+        if (primaryAccentColor.startsWith('#')) {
+            const hex = primaryAccentColor.substring(1);
+            const r = parseInt(hex.substring(0,2), 16);
+            const g = parseInt(hex.substring(2,4), 16);
+            const b = parseInt(hex.substring(4,6), 16);
+            document.documentElement.style.setProperty('--primary-accent-rgb', `${r},${g},${b}`);
+        }
+      }
+      setPrimaryAccentRGB();
+
+
+      setTimeout(function () {
+        if (splashScreen) splashScreen.classList.add('fade-out');
+        setTimeout(function () {
+          if (splashScreen) splashScreen.style.display = 'none';
+          if (mainContent) {
+            mainContent.classList.remove('hidden');
+            mainContent.classList.add('fade-in');
+            // Controls animation is handled by CSS delay
+          }
+        }, 800); // Duration of splash fade-out
+      }, 1200); // Initial delay before splash starts fading
+    });
+  </script>
+  <script>
+
+    "use strict";
+
+    let audioTrack = document.createElement("audio");
+    audioTrack.preload = "metadata";
+
+    let blurElement = document.getElementById("blurElement");
+    let musicBox = document.getElementById("musicBox");
+
+    let trackItemsWrapper = document.getElementById("trackItemsWrapper");
+    let trackArtistName = document.getElementById("trackArtistName");
+    let trackAlbumName = document.getElementById("trackAlbumName");
+    let trackName = document.getElementById("trackName");
+
+    let coverImage = document.getElementById("coverImage");
+
+    let playButton = document.getElementById("playButton");
+    let playButtonIcon = playButton.firstElementChild;
+    let pauseButtonIcon = playButton.lastElementChild;
+
+    let previousButton = document.getElementById("previousButton");
+    let nextButton = document.getElementById("nextButton");
+
+    // Volume elements (optional, ensure they exist if logic is used)
+    // let volumeWrapper = document.getElementById("volumeWrapper"); ...
+
+    let currentTrackTimeNumber = document.getElementById("currentTrackTimeNumber");
+    let currentTrackDuration = document.getElementById("currentTrackDuration");
+
+    let trackProgressBar = document.getElementById("trackProgressBar");
+    let trackLoading = document.getElementById("trackLoading");
+    let currentTrackTimeBar = document.getElementById("currentTrackTimeBar");
+
+    const searchInput = document.getElementById('searchInput');
+    const albumFilterSelect = document.getElementById('albumFilterSelect');
+
+    let musics = [
+      {
+        trackName: "Sou Sou",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource:
+          "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1V0-Sou%20Sou.mp3"
+      },
+      {
+        trackName: "100 Bulb",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource:
+          "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1VO-100%20bulb.mp3"
+      },
+      {
+        trackName: "Baby",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource:
+          "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1VO-Baby.mp3"
+      },
+      {
+        trackName: "Bom-Bom",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource:
+          "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1VO-Bom-Bom.mp3"
+      },
+    
+      {
+        trackName: "Dear Bina",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource:
+          "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1VO-Dear%20Bina.mp3"
+      },
+      {
+        trackName: "Hairamdana",
+        artist: "tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource:
+          "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1VO-Hairamdana.mp3"
+      },
+      {
+        trackName: "Last warning",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource:
+          "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1VO-Last%20Warning.mp3"
+      },
+      {
+        trackName: "Round kick",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1VO-Round%20kick.mp3"
+      },{
+        trackName: "Rupashree",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1VO-Rupashree.mp3"
+      },{
+        trackName: "Yamaha",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/1VO-Yamaha.mp3"
+      },{
+        trackName: "Power of attraction",
+        artist: "Tapta",
+        album: "Volume 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2001/Power%20of%20attraction.mp3"
+      },{
+        trackName: "231st Dec",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO-231st%20Dec..mp3"
+      },{
+        trackName: "Bad Boy",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO-2Bad%20Boy.mp3"
+      },{
+        trackName: "Black Honda",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO-2Black%20Honda.mp3"
+      },{
+        trackName: "Black Law",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO-2Black%20Law.mp3"
+      },{
+        trackName: "Gate Bar",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO-2Gate%20Bar.mp3"
+      },{
+        trackName: "Ghayal",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO-2Ghayal.mp3"
+      },{
+        trackName: "Koithoktna",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO-2Koithoktna.mp3"
+      },{
+        trackName: "2Oh! Than 10",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO-2Oh!%20Than%2010.mp3"
+      },{
+        trackName: "Sunday",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO-2Sunday.mp3"
+      },{
+        trackName: "Indira",
+        artist: "Tapta",
+        album: "Volume 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2002/1VO2Indira.mp3"
+      },{
+        trackName: "Bidyarani",
+        artist: "Tapta",
+        album: "Volume 03",
+        coverImage: "",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2003/1V0-3Bidyarani.mp3"
+      },{
+        trackName: "Oorit",
+        artist: "Tapta",
+        album: "Volume 03",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/09/logolicious_20170911_102007.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2003/1V0-3OORIT.mp3"
+      },{
+        trackName: "704 Room",
+        artist: "Tapta",
+        album: "Volume 03",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/09/logolicious_20170911_102007.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2003/1VO-3704%20Room.mp3"
+      },{
+        trackName: "Bandh",
+        artist: "Tapta",
+        album: "Volume 03",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/09/logolicious_20170911_102007.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2003/1VO-3Bandh.mp3"
+      },{
+        trackName: "Bus Conductor",
+        artist: "Tapta",
+        album: "Volume 03",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/09/logolicious_20170911_102007.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2003/1VO-3Bus%20Conductor.mp3"
+      },{
+        trackName: "Etei Kou",
+        artist: "Tapta",
+        album: "Volume 03",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/09/logolicious_20170911_102007.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2003/1VO-3Etei%20Kou.mp3"
+      },{
+        trackName: "I Love U Sisy",
+        artist: "Tapta",
+        album: "Volume 03",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/09/logolicious_20170911_102007.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2003/1VO-3I%20Love%20U%20Sisy.mp3"
+      },{
+        trackName: "Nupee",
+        artist: "Tapta",
+        album: "Volume 03",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/09/logolicious_20170911_102007.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2003/1VO-3Nupee.mp3"
+      },{
+        trackName: "Banita",
+        artist: "Tapta",
+        album: "Volume 04",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/1VO-4Banita.mp3"
+      },{
+        trackName: "Doctor",
+        artist: "Tapta",
+        album: "Volume 04",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/1VO-4Doctor.mp3"
+      },{
+        trackName: "Elai Lai",
+        artist: "Tapta",
+        album: "Volume 04",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/1VO-4Elai%20Lai.mp3"
+      },{
+        trackName: "Ema Amatagee Machani",
+        artist: "Tapta",
+        album: "Volume 04",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/1VO-4Ema%20Amatagee%20Machani.mp3"
+      },{
+        trackName: "Photo",
+        artist: "Tapta",
+        album: "Volume 04",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/1VO-4Photo.mp3"
+      },{
+        trackName: "Red Bottle",
+        artist: "Tapta",
+        album: "Volume 04",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/1VO-4Red%20Bottle.mp3"
+      },{
+        trackName: "Tamocha",
+        artist: "Tapta",
+        album: "Volume 04",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/1VO-4Tamocha.mp3"
+      },{
+        trackName: "Thawaigee Thawai",
+        artist: "Tapta",
+        album: "Volume 04",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2004/1VO-4Thawaigee%20Thawai.mp3"
+      },{
+        trackName: "Election",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Election%20(tapta).mp3"
+      },{
+        trackName: "Ajanabi",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Track%202%20(Ajanabi).mp3"
+      },{
+        trackName: "Dot_Dot",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Track%203%20(Dot_Dot).mp3"
+      },{
+        trackName: "Khasland",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Track%204%20(Khasland).mp3"
+      },{
+        trackName: "Stick",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Track%205%20(Stick).mp3"
+      },{
+        trackName: "Melory",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Track%206%20(Melory).mp3"
+      },{
+        trackName: "Sou_2",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Track%207%20(Sou_2).mp3"
+      },{
+        trackName: "Bombula",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Track%208%20(Bombula).mp3"
+      },{
+        trackName: "Sha Shani She",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Track%209%20(Sha%20Shani%20She).mp3"
+      },{
+        trackName: "Wakai",
+        artist: "Tapta",
+        album: "Volume 05",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2005/Track%2010%20(Wakai).mp3"
+      },{
+        trackName: "Hogaybi",
+        artist: "Tapta",
+        album: "Volume 06",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/1VO-6Hogaybi.mp3"
+      },{
+        trackName: "Mahoot",
+        artist: "Tapta",
+        album: "Volume 06",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/1VO-6Mahoot.mp3"
+      },{
+        trackName: "Mantri",
+        artist: "Tapta",
+        album: "Volume 06",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/1VO-6Mantri.mp3"
+      },{
+        trackName: "Pebet",
+        artist: "Tapta",
+        album: "Volume 06",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/1VO-6Pebet.mp3"
+      },{
+        trackName: "Radha",
+        artist: "Tapta",
+        album: "Volume 06",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/1VO-6Radha.mp3"
+      },{
+        trackName: "Tamoo",
+        artist: "Tapta",
+        album: "Volume 06",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/1VO-6Tamoo.mp3"
+      },{
+        trackName: "Yumtakpi",
+        artist: "Tapta",
+        album: "Volume 06",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/1VO-6Yumtakpi.mp3"
+      },{
+        trackName: "Budhu",
+        artist: "Tapta",
+        album: "Volume 06",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2006/Budhu.mp3"
+      },{
+        trackName: "Akampet",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1V0-7Akampet.mp3"
+      },{
+        trackName: "hospital",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1V0-7J.N%20hospital.mp3"
+      },{
+        trackName: "Lai khutshangbee",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1V0-7Lai%20khutshangbee.mp3"
+      },{
+        trackName: "Hiyangthang bor",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1VO-7Hiyangthang%20bor.mp3"
+      },{
+        trackName: "Khoimu",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1VO-7Khoimu.mp3"
+      },{
+        trackName: "Kokka Shaihe",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1VO-7Kokka%20Shaihe.mp3"
+      },{
+        trackName: "Nungshiba",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1VO-7Nungshiba.mp3"
+      },{
+        trackName: "Punshise Wai",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1VO-7Punshise%20Wai.mp3"
+      },{
+        trackName: "We Bilief",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1VO-7We%20Bilief.mp3"
+      },{
+        trackName: "We want peace",
+        artist: "Tapta",
+        album: "Volume 07",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2007/1VO-7We%20want%20peace.mp3"
+      },{
+        trackName: "Commando",
+        artist: "Tapta",
+        album: "Volume 08",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/1V0-8Commando.mp3"
+      },{
+        trackName: "EeEi",
+        artist: "Tapta",
+        album: "Volume 08",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/1VO-8EeEi.mp3"
+      },{
+        trackName: "Ei Vote Lepkhinee",
+        artist: "Tapta",
+        album: "Volume 08",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/1VO-8Ei%20Vote%20Lepkhinee.mp3"
+      },{
+        trackName: "Exam Hall",
+        artist: "Tapta",
+        album: "Volume 08",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/1VO-8Exam%20Hall.mp3"
+      },{
+        trackName: "Humfu",
+        artist: "Tapta",
+        album: "Volume 08",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/1VO-8Humfu.mp3"
+      },{
+        trackName: "Kongol",
+        artist: "Tapta",
+        album: "Volume 08",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/1VO-8Kongol.mp3"
+      },{
+        trackName: "Nangee Loohongba",
+        artist: "Tapta",
+        album: "Volume 08",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/1VO-8Nangee%20Loohongba.mp3"
+      },{
+        trackName: "Nathibong",
+        artist: "Tapta",
+        album: "Volume 08",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/1VO-8Nathibong.mp3"
+      },{
+        trackName: "Nongthang",
+        artist: "Tapta",
+        album: "Volume 08",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2008/1VO-8Nongthang.mp3"
+      },{
+        trackName: "Bidai",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Bidai.mp3"
+      },{
+        trackName: "Chhuingam",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Chhuingam.mp3"
+      },{
+        trackName: "Garee",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Garee.mp3"
+      },{
+        trackName: "Kothe",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Kothe.mp3"
+      },{
+        trackName: "Loktak Project",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Loktak%20Project.mp3"
+      },{
+        trackName: "Naharol",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Naharol.mp3"
+      },{
+        trackName: "Shantibala",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Shantibala.mp3"
+      },{
+        trackName: "Subha-Bibaha",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Subha-Bibaha.mp3"
+      },{
+        trackName: "Tamnalai",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Tamnalai.mp3"
+      },{
+        trackName: "Huklamdringei Kundo",
+        artist: "Tapta",
+        album: "Volume 09",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/78%201VO-9Huklamdringei%20Kundo.mp3"
+      },{
+        trackName: "Amadusu",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10Amadusu.mp3"
+      },{
+        trackName: "Baby Elizabeth",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10Baby%20Elizabeth.mp3"
+      },{
+        trackName: "Chithi",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10CHITHI.mp3"
+      },{
+        trackName: "Dasha",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10Dasha.mp3"
+      },{
+        trackName: "Fi!",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10Fi!.mp3"
+      },{
+        trackName: "Hanna hanna",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10HANNA-HANNA.mp3"
+      },{
+        trackName: "Hameibon Yonbi",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10Hameibon%20Yonbi.mp3"
+      },{
+        trackName: "Hi!",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10Hi!.mp3"
+      },{
+        trackName: "Nongmei",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10Nongmei.mp3"
+      },{
+        trackName: "Se echalse",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10SE%20ECHLSE.mp3"
+      },{
+        trackName: "Talab",
+        artist: "Tapta",
+        album: "Volume 10",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2010/1VO-10Talab.mp3"
+      },{
+        trackName: "Anithokpi",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Anithokpi.mp3"
+      },{
+        trackName: "Bony Bony",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Bony%20Bony.mp3"
+      },{
+        trackName: "Chamjarabini",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Chamjarabini.mp3"
+      },{
+        trackName: "Chithidadi",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Chithidadi.mp3"
+      },{
+        trackName: "Kichee",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Kichee.mp3"
+      },{
+        trackName: "Phairenthagi",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Phairenthagi.mp3"
+      },{
+        trackName: "Photchani",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Photchani.mp3"
+      },{
+        trackName: "Taone mama",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Taone%20mama.mp3"
+      },{
+        trackName: "Tingkhang",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Tingkhang.mp3"
+      },{
+        trackName: "Tsunami",
+        artist: "Tapta",
+        album: "Volume 11",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2011/Tsunami.mp3"
+      },{
+        trackName: "+ve",
+        artist: "Tapta",
+        album: "Volume 12",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/%2Bve.mp3"
+      },{
+        trackName: "Ashubee",
+        artist: "Tapta",
+        album: "Volume 12",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Ashubee.mp3"
+      },{
+        trackName: "Bandh",
+        artist: "Tapta",
+        album: "Volume 12",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Bandh.mp3"
+      },{
+        trackName: "Demand letter",
+        artist: "Tapta",
+        album: "Volume 12",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Deman%20letter.mp3"
+      },{
+        trackName: "Laphoi",
+        artist: "Tapta",
+        album: "Volume 12",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Laphoi.mp3"
+      },{
+        trackName: "Noval prize",
+        artist: "Tapta",
+        album: "Volume 12",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Noval%20Prize.mp3"
+      },{
+        trackName: "Oja uiganba",
+        artist: "Tapta",
+        album: "Volume 12",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Oja%20Uiganba.mp3"
+      },{
+        trackName: "Ransom(reject)",
+        artist: "Tapta",
+        album: "Volume 12",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2012/Ransom(Reject).mp3"
+      },{
+        trackName: "Daak",
+        artist: "Tapta",
+        album: "Volume 13",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/TAPTA%20-%20DAAK%20-%20VOL-13%20B...mp3"
+      },{
+        trackName: "Facebook 3",
+        artist: "Tapta",
+        album: "Volume 13",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/TAPTA%20-%20FACE%20BOOK%203%20-%20VOL-13%20B.mp3"
+      },{
+        trackName: "Facebook 69",
+        artist: "Tapta",
+        album: "Volume 13",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/TAPTA%20-%20FACE%20BOOK%2069%20-%20VOL-13%20B.mp3"
+      },{
+        trackName: "Job card",
+        artist: "Tapta",
+        album: "Volume 13",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/TAPTA%20-%20JOB%20CARD%20-%20VOL-13%20B.mp3"
+      },{
+        trackName: "Nuclear bomb",
+        artist: "Tapta",
+        album: "Volume 13",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/TAPTA%20-%20NUCLEAR%20BOMB%20-%20VOL-13%20B.mp3"
+      },{
+        trackName: "Porn videography",
+        artist: "Tapta",
+        album: "Volume 13",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2013/TAPTA%20-%20PORN%20VIDEOGRAPHY%20-%20VOL-13%20B.mp3"
+      },{
+        trackName: "Gv Track",
+        artist: "Tapta",
+        album: "Tapta Fan",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/08/logolicious_20170829_2027251.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Tapta%20Fan/Tapta%20Fan%20(Gv%20Track).mp3"
+      },{
+        trackName: "Smule Track",
+        artist: "Tapta",
+        album: "Tapta Fan",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/08/logolicious_20170829_2027251.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Tapta%20Fan/Tapta%20Fan%20(Smule%20Track).mp3"
+      },{
+        trackName: "Tapta Fan",
+        artist: "Tapta",
+        album: "Tapta Fan",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/08/logolicious_20170829_2027251.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Tapta%20Fan/Tapta%20Fan.mp3"
+      },{
+        trackName: "Mikhal",
+        artist: "Tapta",
+        album: "Tangbo",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/08/logolicious_20170829_2027251.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Tangbo/MIKHL%20-%20tapta.mp3"
+      },{
+        trackName: "Tangbo",
+        artist: "Tapta",
+        album: "Tangbo",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/08/logolicious_20170829_2027251.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Tangbo/TANGBO%20-%20tapta.mp3"
+      },{
+        trackName: "Yek salai",
+        artist: "Tapta",
+        album: "Tangbo",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/08/logolicious_20170829_2027251.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Tangbo/YEK%20SALAI%20-%20tapta.mp3"
+      },{
+        trackName: "1819-1826",
+        artist: "Tapta",
+        album: "7 yrs devastation",
+        coverImage: "http://e-pao.net/galleries/images/RKCS_art_gallery/16_Seven_year's_Devastation_II_(1819_1825).jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/7%20yrs%20devastation/1819-1826.mp3"
+      },{
+        trackName: "Chahi 7 Khuntakpa",
+        artist: "Tapta",
+        album: "7 yrs devastation",
+        coverImage: "http://e-pao.net/galleries/images/RKCS_art_gallery/16_Seven_year's_Devastation_II_(1819_1825).jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/7%20yrs%20devastation/Chahi%207%20Khuntakpa.mp3"
+      },{
+        trackName: "Eikhoigi Mee",
+        artist: "Tapta",
+        album: "7 yrs devastation",
+        coverImage: "http://e-pao.net/galleries/images/RKCS_art_gallery/16_Seven_year's_Devastation_II_(1819_1825).jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/7%20yrs%20devastation/Eikhoigi%20Mee.mp3"
+      },{
+        trackName: "Leipaklei",
+        artist: "Tapta",
+        album: "Eche Sharmila",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/12/img-20170829-wa0052-1-01708804810.jpeg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Eche%20Sharmila/LEIPAKLEI%20OH%20SHARMILA.mp3"
+      },{
+        trackName: "Gwangju",
+        artist: "Tapta",
+        album: "Eche sharmila",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/12/img-20170829-wa0052-1-01708804810.jpeg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Eche%20Sharmila/Sharmila%20Gwangju%20V-02.mp3"
+      },{
+        trackName: "Mihat mipun",
+        artist: "Tapta",
+        album: "Eche sharmila",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/12/img-20170829-wa0052-1-01708804810.jpeg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Eche%20Sharmila/Sharmila(Mihat%20Mipun).mp3"
+      },{
+        trackName: "Sharmila",
+        artist: "Tapta",
+        album: "Eche sharmila",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/12/img-20170829-wa0052-1-01708804810.jpeg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Eche%20Sharmila/Sharmila.mp3"
+      },{
+        trackName: "Ezzat Dabee",
+        artist: "Tapta",
+        album: "Ezzat Dabee",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/EZZAT%20DABEE%20MP3.mp3"
+      },{
+        trackName: "Hangkok",
+        artist: "Tapta",
+        album: "Ezzat Dabee",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/Hangkok.mp3"
+      },{
+        trackName: "Korean Style",
+        artist: "Tapta",
+        album: "Ezzat Dabee",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/Korean%20Style.mp3"
+      },{
+        trackName: "Press Conference",
+        artist: "Tapta",
+        album: "Ezzat Dabee",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/Press%20Conference.mp3"
+      },{
+        trackName: "Restaurant Drive",
+        artist: "Tapta",
+        album: "Ezzat Dabee",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Ezzat%20Dabee/Restaurant%20Drive.mp3"
+      },{
+        trackName: "Keishal",
+        artist: "Tapta",
+        album: "Keishal",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Keishal/KEISHAL%20-%20TAPTA.mp3"
+      },{
+        trackName: "Keishal April",
+        artist: "Tapta",
+        album: "Keishal",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Keishal/KEISHAL%20APRIL.mp3"
+      },{
+        trackName: "Keishal Sad",
+        artist: "Tapta",
+        album: "Keishal",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Keishal/KEISHAL%20SAD%20-%20TAPTA.mp3"
+      },{
+        trackName: "Epam khangbi meiwaire",
+        artist: "Tapta",
+        album: "Mi Manukhang",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/12/img-20170829-wa0052-1-01708804810.jpeg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mee%20Manukhang/Epam%20khangbi%20meiwaire.mp3"
+      },{
+        trackName: "Mee manukhang",
+        artist: "Tapta",
+        album: "Mi Manukhang",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/12/img-20170829-wa0052-1-01708804810.jpeg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mee%20Manukhang/Mee%20manukhang.mp3"
+      },{
+        trackName: "Greater Nagaland",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/1%20Greater%20Nagaland.mp3"
+      },{
+        trackName: "Amada",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/2%20Amada.mp3"
+      },{
+        trackName: "Miss Call",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/3%20Miss%20Call.mp3"
+      },{
+        trackName: "Wrong Number",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/4%20Wrong%20Number.mp3"
+      },{
+        trackName: "Number",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/5%20Number%20(Mobile).mp3"
+      },{
+        trackName: "Recharge Card",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/6%20Recharge%20Card.mp3"
+      },{
+        trackName: "Message",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/7%20Message.mp3"
+      },{
+        trackName: "Line Busy",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/8%20Line%20Busy.mp3"
+      },{
+        trackName: "Memory",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/9%20Memory%20(Mobile).mp3"
+      },{
+        trackName: "Bluetooth",
+        artist: "Tapta",
+        album: "Mobile 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2001/10%20Bluetooth.mp3"
+      },{
+        trackName: "3G Mobile",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/1.3G%20Mobile.mp3"
+      },{
+        trackName: "Received Call",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/2.Received%20Call.mp3"
+      },{
+        trackName: "Contact Number",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/3.Contact%20Number.mp3"
+      },{
+        trackName: "Night Pack",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/4.Night%20Pack.mp3"
+      },{
+        trackName: "Down Load",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/5.Down%20Load.mp3"
+      },{
+        trackName: "Wall Paper",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/6.Wall%20Paper.mp3"
+      },{
+        trackName: "Inbox",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/7.Inbox.mp3"
+      },{
+        trackName: "Sim Card",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/8.Sim%20Card.mp3"
+      },{
+        trackName: "Dailled Call",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/9.Dailled%20Call.mp3"
+      },{
+        trackName: "SMS Service",
+        artist: "Tapta",
+        album: "Mobile 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Special%20Attraction/Mobile%2002/10.SMS%20Service.mp3"
+      },{
+        trackName: "2or3 VS 5or6 OKK",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/1%20TAPTA%202or3%20VS%205or6%20OKK.mp3"
+      },{
+        trackName: "81 Pillar",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/81%20Pillar"
+      },{
+        trackName: "Action to muction",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/ACTION%20TO%20MUCTION.mp3"
+      },{
+        trackName: "Black coat",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/BLACK%20COAT.mp3"
+      },{
+        trackName: "Broiler",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/BROILER%20-%20TAPTA.mp3"
+      },{
+        trackName: "Black Coat (TSL)",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/Black%20Coat%20(TSL).mp3"
+      },{
+        trackName: "Cso concert",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/CSO%20concert.mp3"
+      },{
+        trackName: "Cso tapta",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/CSO-tapta.mp3"
+      },{
+        trackName: "Kuire Unakhidaba",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/Kuire%20Unakhidaba.mp3"
+      },{
+        trackName: "RiverBank Music Festival",
+        artist: "Tapta",
+        album: "Singles",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Singles/RiverBank%20Music%20Festival.mp3"
+      },{
+        trackName: "Basanta Kainarabi Gulap",
+        artist: "Tapta",
+        album: "Basanta Kainarabi Gulap",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Basanta%20Kainrabi%20Gulap%20ok.mp3"
+      },{
+        trackName: "Chatkhredo nangdi ningba kaina",
+        artist: "Tapta",
+        album: "Basanta Kainarabi Gulap",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Chatkhredo%20nangdi%20ningba%20kaina.mp3"
+      },{
+        trackName: "Chinglon Lanna Leihoubi",
+        artist: "Tapta",
+        album: "Basanta Kainarabi Gulap",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Chinglon%20Lanna%20Leihoubi.mp3"
+      },{
+        trackName: "Inaktagi Lapkhrabido",
+        artist: "Tapta",
+        album: "Basanta Kainarabi Gulap",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Inaktagi%20Lapkhrabido.mp3.mp3"
+      },{
+        trackName: "Kapliba Punsibu",
+        artist: "Tapta",
+        album: "Basanta Kainarabi Gulap",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Kapliba%20Punsibu.mp3"
+      },{
+        trackName: "Nokpa Heijadraba Punsini",
+        artist: "Tapta",
+        album: "Basanta Kainarabi Gulap",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Nokpa%20Heijadraba%20Punsini.mp3"
+      },{
+        trackName: "Siroi Chingi Napomda",
+        artist: "Tapta",
+        album: "Basanta Kainarabi Gulap",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Basanta%20Kainarabi%20Gulap/Siroi%20Chingi%20Napomda.mp3"
+      },{
+        trackName: "Combing Operation",
+        artist: "Tapta",
+        album: "Combing Operation",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/6S-Combing%20Operation.mp3"
+      },{
+        trackName: "Eche",
+        artist: "Tapta",
+        album: "Combing Operation",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/6S-Eche.mp3"
+      },{
+        trackName: "Eidi Khangi",
+        artist: "Tapta",
+        album: "Combing Operation",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/6S-Eidi%20Khangi.mp3"
+      },{
+        trackName: "Englaba thabal",
+        artist: "Tapta",
+        album: "Combing Operation",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/6S-Englaba%20thabal.mp3"
+      },{
+        trackName: "Guitar",
+        artist: "Tapta",
+        album: "Combing Operation",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/6S-Guitar.mp3"
+      },{
+        trackName: "Kainani Khallaga",
+        artist: "Tapta",
+        album: "Combing Operation",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/6S-Kainani%20Khallaga.mp3"
+      },{
+        trackName: "Laklammi Haiba",
+        artist: "Tapta",
+        album: "Combing Operation",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/6S-Laklammi%20Haiba.mp3"
+      },{
+        trackName: "Pulsar",
+        artist: "Tapta",
+        album: "Combing Operation",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/6S-Pulsar.mp3"
+      },{
+        trackName: "Thongnao marumdagi",
+        artist: "Tapta",
+        album: "Combing Operation",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Combing%20Operation/6S-Thongnao%20marumdagi.mp3"
+      },{
+        trackName: "Amashung",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Amashung.mp3"
+      },{
+        trackName: "Atithini",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Atithini.mp3"
+      },{
+        trackName: "Basanta",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Basanta.mp3"
+      },{
+        trackName: "Hooijao",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Hooijao.mp3"
+      },{
+        trackName: "Khudop",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Khudop.mp3"
+      },{
+        trackName: "Mahoot",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Mahoot.mp3"
+      },{
+        trackName: "Modern Girl",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Modern%20Girl.mp3"
+      },{
+        trackName: "Pakhang",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Pakhang.mp3"
+      },{
+        trackName: "Sabitri",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Sabitri.mp3"
+      },{
+        trackName: "Secy",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-Secy.mp3"
+      },{
+        trackName: "maroo",
+        artist: "Tapta",
+        album: "Khudop",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Khudop/4S-maroo.mp3"
+      },{
+        trackName: "Channabi",
+        artist: "Tapta",
+        album: "Maga Nanga",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/3S-Channabi.mp3"
+      },{
+        trackName: "Ching-gee Leirang",
+        artist: "Tapta",
+        album: "Maga Nanga",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/3S-Ching-gee%20Leirang.mp3"
+      },{
+        trackName: "Hada Leirang",
+        artist: "Tapta",
+        album: "Maga Nanga",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/3S-Hada%20Leirang.mp3"
+      },{
+        trackName: "Kundo Pareng",
+        artist: "Tapta",
+        album: "Maga Nanga",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/3S-Kundo%20Pareng.mp3"
+      },{
+        trackName: "Lambigee Chidaida",
+        artist: "Tapta",
+        album: "Maga Nanga",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/3S-Lambigee%20Chidaida.mp3"
+      },{
+        trackName: "Maga nanga",
+        artist: "Tapta",
+        album: "Maga Nanga",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/3S-Maa-ga%20Nng%20-gaa.mp3"
+      },{
+        trackName: "Thambal",
+        artist: "Tapta",
+        album: "Maga Nanga",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/3S-Thambal.mp3"
+      },{
+        trackName: "Wanglaba Thangjing",
+        artist: "Tapta",
+        album: "Maga Nanga",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/3S-Wanglaba%20Thangjing.mp3"
+      },{
+        trackName: "Zero Bulb",
+        artist: "Tapta",
+        album: "Maga Nanga",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Maaga%20Nangga/3S-Zero%20Bulb.mp3"
+      },{
+        trackName: "Tamlaba Ching-ya",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/2%20Tamlaba%20Ching-ya.mp3"
+      },{
+        trackName: "Chakka Bandh",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/2S-Chakka%20Bandh.mp3"
+      },{
+        trackName: "Chenkhi Toina",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/2S-Chenkhi%20Toina.mp3"
+      },{
+        trackName: "Karamba Mishumba",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/2S-Karamba%20Mishumba.mp3"
+      },{
+        trackName: "Natheikhrba Echel",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/2S-Natheikhrba%20Echel.mp3"
+      },{
+        trackName: "Noklamba Punshido",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/2S-Noklamba%20Punshido.mp3"
+      },{
+        trackName: "Shambru",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/2S-Shambru.mp3"
+      },{
+        trackName: "Thengnaba",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/2S-Thengnaba.mp3"
+      },{
+        trackName: "Wareda Cheinase",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/2S-Wareda%20Cheinase.mp3"
+      },{
+        trackName: "Peerangni Kainabei",
+        artist: "Tapta",
+        album: "Shambru",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Shambru/7%20Peerangni%20Kainabei.mp3"
+      },{
+        trackName: "Asha",
+        artist: "Tapta",
+        album: "Yum",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/55S-Asha.mp3"
+      },{
+        trackName: "Eibu Nungshi",
+        artist: "Tapta",
+        album: "Yum",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/55S-Eibu%20Nungshi.mp3"
+      },{
+        trackName: "Engalei",
+        artist: "Tapta",
+        album: "Yum",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/55S-Engalei.mp3"
+      },{
+        trackName: "Keinya-dan",
+        artist: "Tapta",
+        album: "Yum",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/55S-Keinya-dan.mp3"
+      },{
+        trackName: "Leisha Leishna",
+        artist: "Tapta",
+        album: "Yum",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/55S-Leisha%20Leishna.mp3"
+      },{
+        trackName: "Lemjbi",
+        artist: "Tapta",
+        album: "Yum",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/55S-Lemjbi.mp3"
+      },{
+        trackName: "Meichak",
+        artist: "Tapta",
+        album: "Yum",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/55S-Meichak.mp3"
+      },{
+        trackName: "Miramda Leiringei",
+        artist: "Tapta",
+        album: "Yum",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/55S-Miramda%20Leiringei.mp3"
+      },{
+        trackName: "Paokhum",
+        artist: "Tapta",
+        album: "Yum",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Series/Yum/55S-Paokhum.mp3"
+      },{
+        trackName: "Buldhu",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Buldhu.mp3"
+      },{
+        trackName: "Ee",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Ee.mp3"
+      },{
+        trackName: "Indian Shining",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Indian%20Shining.mp3"
+      },{
+        trackName: "Laireibak",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Laireibak.mp3"
+      },{
+        trackName: "Luching Purel",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Luching%20Purel.mp3"
+      },{
+        trackName: "Meigi Cheeng",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Meigi%20Cheeng.mp3"
+      },{
+        trackName: "Parcentage",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Parcentage.mp3"
+      },{
+        trackName: "Pheijei",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Pheijei.mp3"
+      },{
+        trackName: "Prime Minister",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Prime%20Minister.mp3"
+      },{
+        trackName: "Tandop",
+        artist: "Tapta",
+        album: "1958",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/1958/23%20Tandop.mp3"
+      },{
+        trackName: "Nokliba",
+        artist: "Tapta",
+        album: "Abok 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/-Nokliba.mp3"
+      },{
+        trackName: "Abok",
+        artist: "Tapta",
+        album: "Abok 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/51P-Abok.mp3"
+      },{
+        trackName: "Kabaw Velley",
+        artist: "Tapta",
+        album: "Abok 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/51P-Kabaw%20Velley.mp3"
+      },{
+        trackName: "Shidani Waribase",
+        artist: "Tapta",
+        album: "Abok 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/51P-Shidani%20Waribase.mp3"
+      },{
+        trackName: "Chingyagi Chiklaba",
+        artist: "Tapta",
+        album: "Abok 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Chingyagi%20Chiklaba.mp3"
+      },{
+        trackName: "Kaongamdraba",
+        artist: "Tapta",
+        album: "Abok 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Kaongamdraba.mp3"
+      },{
+        trackName: "Pamde",
+        artist: "Tapta",
+        album: "Abok 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Pamde.mp3"
+      },{
+        trackName: "Sidani waribase emana",
+        artist: "Tapta",
+        album: "Abok 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Sidani%20waribase%20emana.mp3"
+      },{
+        trackName: "Tuminna leirasira",
+        artist: "Tapta",
+        album: "Abok 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Tuminna%20leirasira.mp3"
+      },{
+        trackName: "Ekaibagi",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-EKAIBAGIFI.mp3"
+      },{
+        trackName: "Eramdam",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-Ermdm.mp3"
+      },{
+        trackName: "Hari Nongnang",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-Hari%20Nongnang.mp3"
+      },{
+        trackName: "Ningtamba",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-Ningtamba.mp3"
+      },{
+        trackName: "Shakhangdaba Lamkoiba",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-Shakhangdaba%20Lamkoiba.mp3"
+      },{
+        trackName: "Shendong",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-Shendong.mp3"
+      },{
+        trackName: "Thabaton",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-Thabaton.mp3"
+      },{
+        trackName: "Tubonbi",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-Tubonbi.mp3"
+      },{
+        trackName: "Umaibi",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-Umaibi.mp3"
+      },{
+        trackName: "Yenbongi Yenao",
+        artist: "Tapta",
+        album: "Abok 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2002/53P-Yenbongee%20Yennao.mp3"
+      },{
+        trackName: "21st Century",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/21ST%20CENTURY.mp3"
+      },{
+        trackName: "Chingsang",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/CHINGSANG.mp3"
+      },{
+        trackName: "Lambi",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/LAMBI.mp3"
+      },{
+        trackName: "Leibak ningba",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/LEIBAK%20NINGBA.mp3"
+      },{
+        trackName: "Meira",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/Meira.mp3"
+      },{
+        trackName: "Naoshum",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/NAOSHUM.mp3"
+      },{
+        trackName: "Shum",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/SHUM.mp3"
+      },{
+        trackName: "Shurung",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/SURUNG.MP3"
+      },{
+        trackName: "Uthambal",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/UTHAMBAL.mp3"
+      },{
+        trackName: "Utangbi",
+        artist: "Tapta",
+        album: "Abok 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Abok%2003/Utangbi.mp3"
+      },{
+        trackName: "Maru",
+        artist: "Tapta",
+        album: "Kadomdano",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/1%20Maru.mp3"
+      },{
+        trackName: "Hingkho Haibro",
+        artist: "Tapta",
+        album: "Kadomdano",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/5P-Hingkho%20Haibro.mp3"
+      }
+      ,{
+        trackName: "Kadomdano",
+        artist: "Tapta",
+        album: "Kadomdano",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/5P-Kadomdano.mp3"
+      }
+      ,{
+        trackName: "Krishna",
+        artist: "Tapta",
+        album: "Kadomdano",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/5P-Krishna.mp3"
+      }
+      ,{
+        trackName: "Punshillo",
+        artist: "Tapta",
+        album: "Kadomdano",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/5P-Punshillo.mp3"
+      }
+      ,{
+        trackName: "Second hel",
+        artist: "Tapta",
+        album: "Kadomdano",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/5P-Second%20hel.mp3"
+      }
+      ,{
+        trackName: "Twingkle Twingkle",
+        artist: "Tapta",
+        album: "Kadomdano",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/5P%3DTwingkle%20Twingkle.mp3"
+      }
+      ,{
+        trackName: "Khabar",
+        artist: "Tapta",
+        album: "Kadomdano",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/7%20Khabar.mp3"
+      }
+      ,{
+        trackName: "Machu taret",
+        artist: "Tapta",
+        album: "Kadomdano",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Kadomdano/8%20Machu%20taret.mp3"
+      },{
+        trackName: "Houro",
+        artist: "Tapta",
+        album: "Oja",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Oja/HOURO.mp3"
+      },{
+        trackName: "Khonjel",
+        artist: "Tapta",
+        album: "Oja",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Oja/KHONJEL.mp3"
+      },{
+        trackName: "Kangleipak",
+        artist: "Tapta",
+        album: "Oja",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Oja/Kangleipak.mp3"
+      },{
+        trackName: "Leishem",
+        artist: "Tapta",
+        album: "Oja",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Oja/LEISHEM.mp3"
+      },{
+        trackName: "Leplaroi",
+        artist: "Tapta",
+        album: "Oja",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Oja/LEPLAROI.mp3"
+      },{
+        trackName: "Oja",
+        artist: "Tapta",
+        album: "Oja",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Oja/OJA.mp3"
+      },{
+        trackName: "Phiral",
+        artist: "Tapta",
+        album: "Oja",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Oja/PHIRAL.mp3"
+      },{
+        trackName: "Shaktam",
+        artist: "Tapta",
+        album: "Oja",
+        coverImage: "https://taptalyrics.files.wordpress.com/2017/03/wp-1488797100359.jpg?w=1080",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Oja/Shaktam.mp3"
+      },{
+        trackName: "Bande Mataram",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-Bande%20Mataram.mp3"
+      },{
+        trackName: "Cyclone",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-Cyclone.mp3"
+      },{
+        trackName: "Jome",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-Jome.mp3"
+      },{
+        trackName: "Khomlang",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-Khomlang.mp3"
+      },{
+        trackName: "Morgue",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-Morgue.mp3"
+      },{
+        trackName: "National Hiway 39",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-National%20Hiway%2039.mp3"
+      },{
+        trackName: "Panji",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-Panji.mp3"
+      },{
+        trackName: "Problem",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-Probleme.mp3"
+      },{
+        trackName: "Restaurent",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-Restaurent.mp3"
+      },{
+        trackName: "Wanted",
+        artist: "Tapta",
+        album: "Wanted",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Pruck/Wanted/54P-Wanted.mp3"
+      },{
+        trackName: "Bobin",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-BOBIN.mp3"
+      },{
+        trackName: "Eikhoi hourase",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-EIKHOI%20HOURASE.mp3"
+      },{
+        trackName: "Naoboy",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-NAOBOY.mp3"
+      },{
+        trackName: "Pravin",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-PRAVIN.mp3"
+      },{
+        trackName: "Premila",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-PREMILA.mp3"
+      },{
+        trackName: "Premjit",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-PREMJIT.mp3"
+      },{
+        trackName: "Roshini",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-ROSHNI.mp3"
+      },{
+        trackName: "Sangita",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-SANGITA.mp3"
+      },{
+        trackName: "Gv1 tapta",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-TAPTA.mp3"
+      },{
+        trackName: "Gv1 with Premila",
+        artist: "Tapta",
+        album: "GV 01",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2001/GV1-WITH%20PREMILA.mp3"
+      },{
+        trackName: "Gv2 wt chanchan",
+        artist: "Tapta",
+        album: "GV 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/GV2-WITH%20CHAN%20CHAN.mp3"
+      },{
+        trackName: "Gv2 wt mandakini",
+        artist: "Tapta",
+        album: "GV 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/GV2-WITH%20MANDAKINI.mp3"
+      },{
+        trackName: "Gv2 wt premila",
+        artist: "Tapta",
+        album: "GV 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/GV2-WITH%20PREMILA.mp3"
+      },{
+        trackName: "Gv2 wt Rosibina",
+        artist: "Tapta",
+        album: "GV 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/GV2-WITH%20PREMILA.mp3"
+      },{
+        trackName: "Gv2 wt Rosini",
+        artist: "Tapta",
+        album: "GV 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/GV2-WITH%20ROSINI.mp3"
+      },{
+        trackName: "Gv2 wt Sangita",
+        artist: "Tapta",
+        album: "GV 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/GV2-WITH%20SANGITA.mp3"
+      },{
+        trackName: "Gv2 wt Suchitra",
+        artist: "Tapta",
+        album: "GV 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/GV2-WITH%20SUCHHITRA.mp3"
+      },{
+        trackName: "Gv2 wt yaiphabi",
+        artist: "Tapta",
+        album: "GV 02",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2002/GV2-WITH%20YAIPHABI.mp3"
+      },{
+        trackName: "Group (blockade)",
+        artist: "Tapta",
+        album: "GV 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/GV3-GROUP%20(Blockade).mp3"
+      },{
+        trackName: "Thengnakhragum touweduni",
+        artist: "Tapta",
+        album: "GV 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/GV3-WITH%20AJIT%20(Thengnakhragum%20touweduni).mp3"
+      },{
+        trackName: "Wadana",
+        artist: "Tapta",
+        album: "GV 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/GV3-WITH%20BUDHI%20(Wadana).mp3"
+      },{
+        trackName: "Atombi",
+        artist: "Tapta",
+        album: "GV 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/GV3-WITH%20DEVKUUMAR%20(Atombi).mp3"
+      },{
+        trackName: "Shambal",
+        artist: "Tapta",
+        album: "GV 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/GV3-WITH%20LEKHAJIT%20(Shambal).mp3"
+      },{
+        trackName: "Gv2 wt Master",
+        artist: "Tapta",
+        album: "GV 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/GV3-WITH%20MASTER.mp3"
+      },{
+        trackName: "Show",
+        artist: "Tapta",
+        album: "GV 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/GV3-WITH%20SURCHAMBA%20(Show).mp3"
+      },{
+        trackName: "Yo Tai",
+        artist: "Tapta",
+        album: "GV 03",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/Folder.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Group%20Voice/GV%2003/GV3-WITH%20TONDANG%20(Yo%20Tai).mp3"
+      },{
+        trackName: "hare Krishna",
+        artist: "Tapta",
+        album: "Bhajan",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Devotional/Bhajan/IMG-20170420-WA0010.jpg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Devotional/Bhajan/Hare%20Krishna.mp3"
+      },{
+        trackName: "Chinese Queen",
+        artist: "Tapta",
+        album: "Corona",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Corona/Tapta%20Chinese%20Queen.jpeg",
+        audioSource: "https://www.dropbox.com/s/fn0lity4230ui1e/CHINESE%20QUEEN%20CORONA%201.mp3?dl=1"
+      },{
+        trackName: "5 Kg",
+        artist: "Tapta",
+        album: "Corona",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhJk1EPsoDd2vwvsIcY9G70aVD65JiAmlvTKlcrARVvCL3JLqzwvdHwKcltfUK0YyBDh__hyJoarsVA5i6wpvO22QhEz7GhbYVg-JcS1ZpDAXpLn2A8hbteeZN_aX6k9cI3mLzpLTs6H6LdCPnYEqDk7eGlWgIDwup63rU7TMewTMni8QfkeqFm9NMO/s300/download%20(4).jpeg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/kg%205%20(online-audio-converter.com).mp3"
+      },{
+        trackName: "Drugs",
+        artist: "Tapta",
+        album: "Corona",
+        coverImage: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Corona/Tapta%20Drugs%20Corona.jpeg",
+        audioSource: "https://www.dropbox.com/s/3vb1rizxatxriqj/Cheng%20%28Corona%29.mp3?dl=1"
+      },{
+        trackName: "Cheng",
+        artist: "Tapta",
+        album: "Corona",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPsyjbwAPE-IjPekeNt1ThXeO3B3gXhdF40TS_Kkxk8HUZ_RFUqbgwde54joqRFl6IODdsf1gKDfdiogMDosJE-1qolZVP22m8iIr3PfgX768bctv4wPcz0KS3n9i7YLCgdkHrn1TinNZOgfcyj6gw36BKP6-POA3NWIK0tfuMdAbfY0aCHx9ll6e3/s300/download%20(1).jpeg",
+        audioSource: "https://www.dropbox.com/s/3vb1rizxatxriqj/Cheng%20%28Corona%29.mp3?dl=1"
+      },{
+        trackName: "Welcome Corona",
+        artist: "Tapta",
+        album: "Corona",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj4iFNJ9sMF6dxTwY8rQmweZJz_aXWd7VI46bQFcl1jjz5I8fyUv00vHJWY4HJOgcilKoWATeKdNvinVzf1i6CWBa3TRiQZobN8SiJ5bkNAPO3xGNanfvWcG1qqELTHqpNEQ2ysBzVVWoDMWm2Q1i4BML_Gl60jelZ75M18kicI8Zd3gSvVQlFRglri/s295/download.jpeg",
+        audioSource: "https://www.dropbox.com/s/1k6v6zyu0c6xxlw/Welcome%20Corona%20%28original%29.mp3?dl=1"
+      },{
+        trackName: "Khongjumgi Mahao",
+        artist: "Tapta",
+        album: "ILP",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj8xnOt9OoQ7Tho4fWhh2tr2sti54bii5ETlwZ-BUlGPvI6JK-fayFfDX64rK-y1vG-mOILgpQ71VHCkCf3D9k86Aleu56R3PKTpkGH4a3DX-u8LEiNsF4h0StBvLCX2ZH7ewJxFWgoIMXdpbs8jMwl1ebudAEeSaFwp4SyI_aq6oH-7ahvrQd3aD15/s225/download%20(2).jpeg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/Khongjumgi%20mahao%20(1).mp3"
+      },{
+        trackName: "Inner Line Permit",
+        artist: "Tapta",
+        album: "ILP",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj8xnOt9OoQ7Tho4fWhh2tr2sti54bii5ETlwZ-BUlGPvI6JK-fayFfDX64rK-y1vG-mOILgpQ71VHCkCf3D9k86Aleu56R3PKTpkGH4a3DX-u8LEiNsF4h0StBvLCX2ZH7ewJxFWgoIMXdpbs8jMwl1ebudAEeSaFwp4SyI_aq6oH-7ahvrQd3aD15/s225/download%20(2).jpeg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/Family%20Planning.mp3_dl%3D0%20(online-audio-converter.com).mp3"
+      },{
+        trackName: "Family Planning",
+        artist: "Tapta",
+        album: "ILP",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj8xnOt9OoQ7Tho4fWhh2tr2sti54bii5ETlwZ-BUlGPvI6JK-fayFfDX64rK-y1vG-mOILgpQ71VHCkCf3D9k86Aleu56R3PKTpkGH4a3DX-u8LEiNsF4h0StBvLCX2ZH7ewJxFWgoIMXdpbs8jMwl1ebudAEeSaFwp4SyI_aq6oH-7ahvrQd3aD15/s225/download%20(2).jpeg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/Family%20Planning.mp3_dl%3D0%20(online-audio-converter.com).mp3"
+      },{
+        trackName: "Waikhu",
+        artist: "Tapta",
+        album: "ILP",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj8xnOt9OoQ7Tho4fWhh2tr2sti54bii5ETlwZ-BUlGPvI6JK-fayFfDX64rK-y1vG-mOILgpQ71VHCkCf3D9k86Aleu56R3PKTpkGH4a3DX-u8LEiNsF4h0StBvLCX2ZH7ewJxFWgoIMXdpbs8jMwl1ebudAEeSaFwp4SyI_aq6oH-7ahvrQd3aD15/s225/download%20(2).jpeg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/Waikhu.mp3_dl%3D0%20(online-audio-converter.com).mp3"
+      },{
+        trackName: "Aka Train",
+        artist: "Tapta",
+        album: "Aka Train",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEit0THpGEOV7ZUwgRvxCyT5iQfMg8N77nMSc4L7nIS5-2O9mhllWSEVrf78UvgG5a-G9RV8OgsZlhFTDDr4ouciaxYfN5fHsVvUpRAfSzwxMbmpRfECKMlCe9YppkWlq-GZbr-9kj4zn0IGVeFI05cLr-Y3lcyFCCo3FfAWcReSRxO-YJJVk4O0GvL2/s259/download%20(3).jpeg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/Aka%20train%20(online-audio-converter.com).mp3"
+      },{
+        trackName: "Pokhaibi",
+        artist: "Tapta",
+        album: "Aka Train",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEit0THpGEOV7ZUwgRvxCyT5iQfMg8N77nMSc4L7nIS5-2O9mhllWSEVrf78UvgG5a-G9RV8OgsZlhFTDDr4ouciaxYfN5fHsVvUpRAfSzwxMbmpRfECKMlCe9YppkWlq-GZbr-9kj4zn0IGVeFI05cLr-Y3lcyFCCo3FfAWcReSRxO-YJJVk4O0GvL2/s259/download%20(3).jpeg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/Pokhaibi.mp3_dl%3D0%20(online-audio-converter.com).mp3"
+      },{
+        trackName: "Munda",
+        artist: "Tapta",
+        album: "Aka Train",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEit0THpGEOV7ZUwgRvxCyT5iQfMg8N77nMSc4L7nIS5-2O9mhllWSEVrf78UvgG5a-G9RV8OgsZlhFTDDr4ouciaxYfN5fHsVvUpRAfSzwxMbmpRfECKMlCe9YppkWlq-GZbr-9kj4zn0IGVeFI05cLr-Y3lcyFCCo3FfAWcReSRxO-YJJVk4O0GvL2/s259/download%20(3).jpeg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/Munda.mp3_dl%3D0%20(online-audio-converter.com).mp3"
+      },{
+        trackName: "Housie Bumper",
+        artist: "Tapta",
+        album: "Aka Train",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEit0THpGEOV7ZUwgRvxCyT5iQfMg8N77nMSc4L7nIS5-2O9mhllWSEVrf78UvgG5a-G9RV8OgsZlhFTDDr4ouciaxYfN5fHsVvUpRAfSzwxMbmpRfECKMlCe9YppkWlq-GZbr-9kj4zn0IGVeFI05cLr-Y3lcyFCCo3FfAWcReSRxO-YJJVk4O0GvL2/s259/download%20(3).jpeg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/Housie%20Bumber%20Draw%20(online-audio-converter.com).mp3"
+      },{
+        trackName: "Shantibala",
+        artist: "Tapta",
+        album: "Aka Train",
+        coverImage: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEit0THpGEOV7ZUwgRvxCyT5iQfMg8N77nMSc4L7nIS5-2O9mhllWSEVrf78UvgG5a-G9RV8OgsZlhFTDDr4ouciaxYfN5fHsVvUpRAfSzwxMbmpRfECKMlCe9YppkWlq-GZbr-9kj4zn0IGVeFI05cLr-Y3lcyFCCo3FfAWcReSRxO-YJJVk4O0GvL2/s259/download%20(3).jpeg",
+        audioSource: "https://github.com/jkmangang/Tapta-Songs-Collection/raw/master/Volumes/Volume%2009/1VO-9Shantibala.mp3"
+      },{
+        trackName: "Kuki Land Vol 1",
+        artist: "Tapta",
+        album: "KuKiLand",
+        coverImage: "https://github.com/Anandkhuman/Music/raw/main/Kuki%20Land%20Vol%201.jpg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/End_of_illegal_immigrants_Chin_Kuki_in_Kangleipak_a2zmanipur.mp3"
+      },{
+        trackName: "Kuki Land Vol 2",
+        artist: "Tapta",
+        album: "KuKiLand",
+        coverImage: "https://github.com/Anandkhuman/Music/raw/main/Kuki%20Land%20Vol%202.jpg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/359554347_175073578789879_2270079620136918405_n.mp3"
+      },{
+        trackName: "Kuki Land Vol 3",
+        artist: "Tapta",
+        album: "KuKiLand",
+        coverImage: "https://github.com/Anandkhuman/Music/raw/main/kuki%20land%20Vol%203.jpg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/KUKI_LAND_3_9p76XnRqmrs_140.mp3"
+      },{
+        trackName: "Kuki Land Vol 4",
+        artist: "Tapta",
+        album: "KuKiLand",
+        coverImage: "https://github.com/Anandkhuman/Music/raw/main/tapta%20vol%204.jpg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/KUKI_LAND_4_OWjVfk0W6V0_140.mp3"
+      },{
+        trackName: "Kuki Land Vol 5",
+        artist: "Tapta",
+        album: "KuKiLand",
+        coverImage: "https://github.com/Anandkhuman/Music/raw/main/kukiland%205.jpg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/KUKI%20LAND5.mp3"
+      },{
+        trackName: "Kuki Land Vol 6",
+        artist: "Tapta",
+        album: "KuKiLand",
+        coverImage: "https://github.com/Anandkhuman/Music/raw/main/Kukiland%20Vol%206.jpg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/KUKI%20LAND%206.mp3"
+      },{
+        trackName: "Kuki Land Vol 7",
+        artist: "Tapta",
+        album: "KuKiLand",
+        coverImage: "https://github.com/Anandkhuman/Music/raw/main/Kukiland%207.jpg",
+        audioSource: "https://github.com/Anandkhuman/Music/raw/main/KUKI%20LAND%207.mp3"
+      }
+
+
+
+
+    ];
+
+    function populateAlbumFilterSelect() {
+        const uniqueAlbums = ["All Albums", ...new Set(musics.map(m => m.album).sort())];
+        albumFilterSelect.innerHTML = "";
+        uniqueAlbums.forEach(albumName => {
+            const option = document.createElement('option');
+            option.value = (albumName === "All Albums") ? "all" : albumName;
+            option.textContent = albumName;
+            albumFilterSelect.appendChild(option);
+        });
+    }
+
+    function getCurrentPlayingOriginalIndex() {
+        if (audioTrack.src) {
+            const currentMusicItem = musics.find(m => m.audioSource === audioTrack.src);
+            return currentMusicItem ? musics.indexOf(currentMusicItem) : -1;
+        }
+        return -1;
+    }
+
+    function renderTrackList(musicListToRender) {
+        const previouslyPlayingOriginalIndex = getCurrentPlayingOriginalIndex();
+        trackItemsWrapper.innerHTML = "";
+
+        if (musicListToRender.length === 0) {
+            trackItemsWrapper.innerHTML = '<div class="track-item-empty">No songs found.</div>';
+            clearPlayerInfo();
+            return;
+        }
+
+        musicListToRender.forEach((musicItem, displayIndex) => {
+            const originalIndex = musics.indexOf(musicItem);
+            const trackDiv = document.createElement('div');
+            trackDiv.classList.add('track-item');
+            trackDiv.dataset.index = originalIndex;
+             // === JAVASCRIPT MODIFIED HERE ===
+            trackDiv.textContent = musicItem.trackName; // Set text to ONLY the name
+             // ================================
+            trackItemsWrapper.appendChild(trackDiv);
+        });
+
+        let newActiveItemFoundInFilter = false;
+        const itemsInCurrentRender = Array.from(trackItemsWrapper.querySelectorAll('.track-item'));
+
+        if (previouslyPlayingOriginalIndex !== -1) {
+            const itemToReactivate = itemsInCurrentRender.find(item =>
+                parseInt(item.dataset.index, 10) === previouslyPlayingOriginalIndex
+            );
+            if (itemToReactivate) {
+                itemToReactivate.classList.add("active");
+                newActiveItemFoundInFilter = true;
+                informationUpdateUI(previouslyPlayingOriginalIndex);
+            }
+        }
+
+        if (!newActiveItemFoundInFilter && itemsInCurrentRender.length > 0) {
+            // Check if audio is already playing something that's still in the filtered list
+            // If not, or if nothing was playing, load the first item.
+            // This logic can be refined, but for now, if no active item, set first as active and load.
+             const firstItemOriginalIndex = parseInt(itemsInCurrentRender[0].dataset.index, 10);
+             if (getCurrentPlayingOriginalIndex() !== firstItemOriginalIndex || audioTrack.paused) {
+                itemsInCurrentRender[0].classList.add("active");
+                loadAndPlaySong(itemsInCurrentRender[0].dataset.index, false); // false = don't force play
+             } else {
+                 // If already playing the first visible item, just ensure it's marked active
+                 itemsInCurrentRender[0].classList.add("active");
+                 informationUpdateUI(firstItemOriginalIndex);
+             }
+        } else if (itemsInCurrentRender.length === 0 && !newActiveItemFoundInFilter) {
+             clearPlayerInfo();
+        }
+    }
+
+
+    function filterAndRenderTracks() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedAlbumValue = albumFilterSelect.value;
+        const filteredMusics = musics.filter(music =>
+            (music.trackName.toLowerCase().includes(searchTerm) ||
+             music.artist.toLowerCase().includes(searchTerm) ||
+             music.album.toLowerCase().includes(searchTerm)) &&
+            (selectedAlbumValue === "all" || music.album === selectedAlbumValue)
+        );
+        renderTrackList(filteredMusics);
+    }
+
+    function informationUpdateUI(originalIndex) {
+        originalIndex = parseInt(originalIndex, 10);
+        if (isNaN(originalIndex) || originalIndex < 0 || originalIndex >= musics.length) {
+             return;
+        }
+        const currentMusic = musics[originalIndex];
+        coverImage.src = currentMusic.coverImage;
+        document.documentElement.style.setProperty('--cover-image-url', `url('${currentMusic.coverImage}')`); // For blur
+        trackArtistName.textContent = currentMusic.artist;
+        trackAlbumName.textContent = currentMusic.album;
+        trackName.textContent = currentMusic.trackName;
+
+        const trackItems = trackItemsWrapper.querySelectorAll('.track-item');
+        trackItems.forEach(item => {
+            item.classList.remove('active');
+            if (parseInt(item.dataset.index, 10) === originalIndex) item.classList.add('active');
+        });
+    }
+
+     function loadAndPlaySong(originalIndexStr, shouldPlay = true) {
+        const originalIndex = parseInt(originalIndexStr, 10);
+         if (isNaN(originalIndex) || originalIndex < 0 || originalIndex >= musics.length) {
+            clearPlayerInfo(); return;
+        }
+        const currentMusic = musics[originalIndex];
+        let songChanged = audioTrack.src !== currentMusic.audioSource;
+
+        if (songChanged) {
+            audioTrack.src = currentMusic.audioSource;
+        }
+        informationUpdateUI(originalIndex); // Update UI elements like title, artist, active class
+
+        if (shouldPlay) {
+            if (audioTrack.paused || songChanged) { // Play if paused or if it's a new song
+                audioTrack.play().catch(e => console.warn("Play error on loadAndPlaySong:", e));
+            }
+        } 
+    }
+
+    function clearPlayerInfo() {
+        coverImage.src = "https://via.placeholder.com/300/111/555?text=TAPTA"; // Generic placeholder
+        document.documentElement.style.setProperty('--cover-image-url', 'none');
+        if(audioTrack.src && !audioTrack.paused) audioTrack.pause(); // Pause before clearing src
+        audioTrack.src = ""; // Clear the source
+        trackArtistName.textContent = "Artist";
+        trackAlbumName.textContent = "Album";
+        trackName.textContent = "Track Name";
+        currentTrackTimeNumber.textContent = "0:00";
+        currentTrackDuration.textContent = "0:00";
+        currentTrackTimeBar.style.width = "0%";
+        if(playButtonIcon) playButtonIcon.style.opacity = 1;
+        if(pauseButtonIcon) pauseButtonIcon.style.opacity = 0;
+        trackLoading.classList.remove("track-loading"); // Ensure loading indicator is off
+    }
+
+    trackItemsWrapper.addEventListener("click", (e) => {
+      if (e.target && e.target.classList.contains('track-item')) {
+         loadAndPlaySong(e.target.dataset.index, true); // true to play on click
+      }
+    });
+
+
+    audioTrack.addEventListener("waiting", () => {
+        if (audioTrack.src) trackLoading.classList.add("track-loading");
+    });
+    audioTrack.addEventListener("canplay", () => trackLoading.classList.remove("track-loading"));
+    audioTrack.addEventListener("stalled", () => {
+       if (audioTrack.src) trackLoading.classList.add("track-loading");
+    });
+     audioTrack.addEventListener("error", () => {
+        trackLoading.classList.remove("track-loading");
+        console.error("Audio playback error");
+         if(playButtonIcon) playButtonIcon.style.opacity = 1;
+        if(pauseButtonIcon) pauseButtonIcon.style.opacity = 0;
+    });
+
+    audioTrack.addEventListener("loadstart", (e) => {
+      currentTrackTimeBar.style.width = "0%";
+       if (audioTrack.src) {
+          trackLoading.classList.add("track-loading");
+      }
+    });
+
+    audioTrack.addEventListener("loadeddata", () => {
+        trackLoading.classList.remove("track-loading");
+     });
+
+
+    requestAnimationFrame(function currentTimeUpdater() {
+        if (audioTrack.duration && !isNaN(audioTrack.duration) && audioTrack.src) {
+            const currentTime = audioTrack.currentTime;
+            const currentMinute = Math.floor(currentTime / 60);
+            const currentSeconds = Math.floor(currentTime % 60);
+            currentTrackTimeNumber.textContent = `${currentMinute}:${currentSeconds < 10 ? "0" : ""}${currentSeconds}`;
+            currentTrackTimeBar.style.width = (currentTime / audioTrack.duration) * 100 + "%";
+        } else if (!audioTrack.src) { // If no src, reset time display
+            currentTrackTimeNumber.textContent = "0:00";
+            currentTrackTimeBar.style.width = "0%";
+        }
+        requestAnimationFrame(currentTimeUpdater);
+    });
+
+    audioTrack.addEventListener("loadedmetadata", () => {
+        if (audioTrack.duration && !isNaN(audioTrack.duration) && audioTrack.src) {
+            const totalTime = audioTrack.duration;
+            const totalMinute = Math.floor(totalTime / 60);
+            const totalSeconds = Math.floor(totalTime % 60);
+            currentTrackDuration.textContent = `${totalMinute}:${totalSeconds < 10 ? "0" : ""}${totalSeconds}`;
+        } else {
+            currentTrackDuration.textContent = "0:00"; // Reset if no valid duration
+        }
+    });
+
+    trackProgressBar.addEventListener("pointerdown", (e) => {
+        if (!audioTrack.src || !audioTrack.duration) return;
+        const progressBarRect = trackProgressBar.getBoundingClientRect();
+        const clickPositionX = e.clientX - progressBarRect.left;
+        const percentage = clickPositionX / progressBarRect.width;
+        audioTrack.currentTime = audioTrack.duration * percentage;
+        currentTrackTimeBar.style.width = percentage * 100 + "%";
+
+        function onPointerMove(moveEvent) {
+            if (!audioTrack.src || !audioTrack.duration) return;
+            let newX = moveEvent.clientX - progressBarRect.left;
+            newX = Math.max(0, Math.min(newX, progressBarRect.width)); // Clamp
+            const newPercentage = newX / progressBarRect.width;
+            audioTrack.currentTime = audioTrack.duration * newPercentage;
+            currentTrackTimeBar.style.width = newPercentage * 100 + "%";
+        }
+        function onPointerUp() {
+            document.removeEventListener("pointermove", onPointerMove);
+            document.removeEventListener("pointerup", onPointerUp);
+        }
+        document.addEventListener("pointermove", onPointerMove);
+        document.addEventListener("pointerup", onPointerUp);
+    });
+
+    trackProgressBar.addEventListener("wheel", (e) => {
+      if (!audioTrack.src || !audioTrack.duration) return;
+      e.preventDefault();
+      let newTime = audioTrack.currentTime + (e.deltaY < 0 ? 5 : -5); // 5 seconds forward/backward
+      audioTrack.currentTime = Math.max(0, Math.min(newTime, audioTrack.duration)); // Clamp
+    }, { passive: false });
+
+
+    playButton.addEventListener("click", (e) => {
+      if (!audioTrack.src) {
+          const firstVisibleTrack = trackItemsWrapper.querySelector('.track-item');
+          if (firstVisibleTrack) {
+              loadAndPlaySong(firstVisibleTrack.dataset.index, true); // true = play
+          }
+          return;
+      }
+      if (audioTrack.paused) {
+        audioTrack.play().catch(error => console.warn("Play action failed:", error));
+      } else {
+        audioTrack.pause();
+      }
+    });
+
+    function playNextOrPrevious(direction) {
+        if (musics.length === 0) return;
+
+        const itemsInCurrentRender = Array.from(trackItemsWrapper.querySelectorAll('.track-item'));
+        if (itemsInCurrentRender.length === 0) return; // No visible tracks to play
+
+        const currentActiveItemInRender = itemsInCurrentRender.find(item => item.classList.contains('active'));
+        let nextIndexInRender;
+
+        if (currentActiveItemInRender) {
+            const currentIndexInRenderList = itemsInCurrentRender.indexOf(currentActiveItemInRender);
+            nextIndexInRender = currentIndexInRenderList + direction;
+        } else {
+             nextIndexInRender = (direction === 1) ? 0 : itemsInCurrentRender.length - 1;
+        }
+
+        // Loop within the rendered items
+        if (nextIndexInRender >= itemsInCurrentRender.length) {
+            nextIndexInRender = 0;
+        } else if (nextIndexInRender < 0) {
+            nextIndexInRender = itemsInCurrentRender.length - 1;
+        }
+
+        if (itemsInCurrentRender[nextIndexInRender]) {
+            const originalIndexToPlay = itemsInCurrentRender[nextIndexInRender].dataset.index;
+            loadAndPlaySong(originalIndexToPlay, true);
+        }
+    }
+
+    previousButton.addEventListener("click", (e) => {
+        playNextOrPrevious(-1);
+    });
+    nextButton.addEventListener("click", (e) => {
+        playNextOrPrevious(1);
+    });
+
+     audioTrack.addEventListener("play", () => {
+        if(playButtonIcon) playButtonIcon.style.opacity = 0;
+        if(pauseButtonIcon) pauseButtonIcon.style.opacity = 1;
+        if (blurElement.animate && getComputedStyle(blurElement).display !== 'none') {
+             if (animationHandler) animationHandler.cancel();
+            blurElement.style.visibility = 'visible';
+            animationHandler = blurElement.animate(
+              { filter: ["blur(10px)", "blur(25px)", "blur(10px)"] },
+              { duration: 4500, easing: "ease-in-out", iterations: Infinity }
+            );
+        }
+    });
+    audioTrack.onended = () => nextButton.click();
+
+    let animationHandler;
+    audioTrack.addEventListener("pause", () => {
+        if(playButtonIcon) playButtonIcon.style.opacity = 1;
+        if(pauseButtonIcon) pauseButtonIcon.style.opacity = 0;
+        if (blurElement.animate && getComputedStyle(blurElement).display !== 'none') {
+            if (animationHandler) {
+                animationHandler.pause();
+                 blurElement.animate({ filter: "blur(10px)" }, { duration: 500, fill: "forwards" });
+           } else {
+                 blurElement.animate({ filter: "blur(10px)" }, { duration: 500, fill: "forwards" });
+            }
+        }
+        trackLoading.classList.remove("track-loading"); 
+    });
+
+
+    document.addEventListener("keydown", (e) => {
+      if (e.target === searchInput || e.target.tagName === 'SELECT' || e.target.isContentEditable) return;
+
+      switch (e.key) {
+        case " ": // Spacebar
+          e.preventDefault();
+          playButton.click();
+          break;
+        case "ArrowRight":
+          nextButton.click();
+          break;
+        case "ArrowLeft":
+          previousButton.click();
+          break;
+       }
+    });
+
+    coverImage.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      if (!coverImage.src || coverImage.src.includes('placeholder') || !audioTrack.src) return; 
+
+      let coverImageBigSize = coverImage.cloneNode(true);
+      coverImageBigSize.className = "cover-image-big-size";
+      document.body.appendChild(coverImageBigSize);
+      requestAnimationFrame(() => {
+          coverImageBigSize.classList.add("show");
+      });
+
+      const removeBigCover = (event) => {
+         if (event.target === coverImageBigSize || event.type === 'pointercancel' || event.key === 'Escape') {
+            coverImageBigSize.classList.remove("show");
+            setTimeout(() => {
+                if (coverImageBigSize.parentNode) coverImageBigSize.remove();
+            }, 400);
+            coverImageBigSize.removeEventListener("pointerup", removeBigCover); 
+            document.removeEventListener("pointercancel", removeBigCover);
+            document.removeEventListener("keydown", keydownCloseCover);
+        }
+      };
+
+      const keydownCloseCover = (event) => {
+        if (event.key === 'Escape') {
+            removeBigCover(event); 
+        }
+      };
+
+      coverImageBigSize.addEventListener("pointerup", removeBigCover);
+      document.addEventListener("pointercancel", removeBigCover);
+      document.addEventListener("keydown", keydownCloseCover);
+    });
+
+    // Initial setup
+    populateAlbumFilterSelect();
+    filterAndRenderTracks();
+    
+    const firstTrackElement = trackItemsWrapper.querySelector('.track-item');
+    if (firstTrackElement) {
+        loadAndPlaySong(firstTrackElement.dataset.index, false); // false = don't play immediately
+    } else {
+        clearPlayerInfo(); // If no tracks, clear info
+    }
+
+
+    searchInput.addEventListener('input', filterAndRenderTracks);
+    albumFilterSelect.addEventListener('change', filterAndRenderTracks);
+
+  </script>
+
+</body>
+</html>
